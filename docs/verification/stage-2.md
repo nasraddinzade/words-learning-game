@@ -1,6 +1,6 @@
 # Stage 2 verification: full learning logic
 
-Date: 2026-10-07. Branch `claude/dreamy-rubin-31q8dd`. Commit range and push status at the end.
+Date: 2026-10-07. Branch `claude/dreamy-rubin-31q8dd`. Commits `e1d6faf`..`d410cb6` plus the loader fix after them; pushed and merged into `main` via pull request (the session cannot push to `main` directly). Full e2e run: 90 passed on three projects, 14.9 min.
 
 ## What was built
 
