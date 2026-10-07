@@ -5,8 +5,8 @@ import { Button } from '@/components/Button';
 import { LearningSettings } from '@/components/LearningSettings';
 import { Screen } from '@/components/Screen';
 import { Toggle } from '@/components/Toggle';
-
-const THEMES = [{ id: 'neon', name: 'Neon' }];
+import { THEMES } from '@/app/themes';
+import { formatCount } from '@/app/format';
 
 export function Settings() {
   const profile = useProfile((s) => s.profile);
@@ -29,19 +29,38 @@ export function Settings() {
 
         <section className="grid gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Theme</h2>
-          <select
-            aria-label="Theme"
-            className="min-h-12 rounded-xl border border-border bg-surface px-3"
-            value={profile.theme}
-            onChange={(e) => void update({ theme: e.target.value })}
-          >
-            {THEMES.map((t) => (
-              <option key={t.id} value={t.id} disabled={!profile.unlockedThemes.includes(t.id)}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-          <p className="text-sm text-muted">More themes unlock every 1 000 learned words (stage 3).</p>
+          <div role="radiogroup" aria-label="Theme" data-testid="themes" className="grid grid-cols-2 gap-2">
+            {THEMES.map((t) => {
+              const unlocked = profile.unlockedThemes.includes(t.id);
+              const selected = profile.theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  aria-disabled={!unlocked}
+                  data-theme-id={t.id}
+                  data-unlocked={unlocked}
+                  disabled={!unlocked}
+                  onClick={() => void update({ theme: t.id })}
+                  className={`flex min-h-12 items-center gap-3 rounded-xl border px-3 text-left ${
+                    selected ? 'border-accent bg-accent/15' : 'border-border bg-surface'
+                  } disabled:opacity-50`}
+                >
+                  <span data-theme={t.id} className="flex h-7 w-7 shrink-0 overflow-hidden rounded-full border border-border" aria-hidden>
+                    <span className="h-full w-1/2" style={{ background: 'var(--accent)' }} />
+                    <span className="h-full w-1/2" style={{ background: 'var(--accent-2)' }} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{t.name}</span>
+                    <span className="block text-xs text-muted">{unlocked ? (t.unlockAt === 0 ? 'Default' : 'Unlocked') : `${formatCount(t.unlockAt)} words`}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted">A new theme unlocks every 1 000 learned words.</p>
         </section>
 
         <section className="grid">

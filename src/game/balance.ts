@@ -50,6 +50,14 @@ export function difficultyAt(level: number): DifficultyLevel {
   return BALANCE.ladder[i] as DifficultyLevel;
 }
 
+/** 0 below 5 in a row, then 1, 2, 3 at 5, 10 and 20 (SPEC §8.1). */
+export function comboTier(combo: number): number {
+  if (combo >= 20) return 3;
+  if (combo >= 10) return 2;
+  if (combo >= 5) return 1;
+  return 0;
+}
+
 export function comboMultiplier(combo: number): number {
   return 1 + Math.floor(combo / BALANCE.comboStep) * BALANCE.comboMultiplierStep;
 }

@@ -26,7 +26,8 @@ npm run icons          # regenerate PWA PNG icons from public/icons/icon.svg
 - UI text is English only. Russian appears only in `translation` of a word entry.
 - `src/engine/` and `src/game/` are pure modules: no React, no DOM globals. Time (`now`, current day) and RNG are passed in as parameters.
 - All game-feel numbers live in `src/game/balance.ts`; learning-logic constants in `src/engine/rules.ts`.
-- Layers: `src/engine` (scheduler, queue) → `src/game` (session, distractors, fall) → `src/app` stores → screens. Lower layers never import higher ones.
+- Layers: `src/engine` (scheduler, queue, streak, milestones) → `src/game` (session, distractors, fall, speed check) → `src/app` stores → screens. Lower layers never import higher ones.
+- Themes are CSS variable sets in `src/index.css` plus the list in `src/app/themes.ts`. Sounds are synthesised in `src/app/sound.ts`, vibration in `src/app/haptics.ts`; both read the Settings toggles.
 - Game loop on `requestAnimationFrame`; falling words are DOM elements moved with `transform`.
 - Dev-only tools (`?seed=`, `?speed=`, dev panel) are gated by `isDevToolsEnabled()` in `src/dev/enabled.ts`. They exist in `vite dev` and in `build:e2e`, never in the production build.
 - Progress is written to IndexedDB after every answer. Never block play because of mistakes or missed days.

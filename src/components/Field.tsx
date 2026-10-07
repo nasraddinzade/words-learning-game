@@ -28,6 +28,8 @@ interface Props {
   devEnabled: boolean;
   /** Tapping the empty field (typing rounds) should refocus the input. */
   onFieldTap?(): void;
+  /** 0-3, raises the glow and the background drift (SPEC §8.1). */
+  comboTier?: number;
 }
 
 function fontClass(word: string): string {
@@ -41,7 +43,7 @@ function fontClass(word: string): string {
  * The falling field. Positions are written straight to the DOM from a requestAnimationFrame
  * loop; React only renders when the round or the typed letters change.
  */
-export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEnabled, onFieldTap }: Props) {
+export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEnabled, onFieldTap, comboTier = 0 }: Props) {
   const fieldRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef(new Map<string, HTMLElement>());
   const [height, setHeight] = useState(0);
@@ -102,7 +104,8 @@ export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEna
       ref={fieldRef}
       data-testid="field"
       aria-label="Game field"
-      className="relative flex-1 overflow-hidden bg-bg-2"
+      data-combo-tier={comboTier}
+      className="field-combo relative flex-1 overflow-hidden bg-bg-2"
       onPointerDown={round?.kind === 'type' ? onFieldTap : undefined}
     >
       <div className="pointer-events-none absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${BALANCE.lanes}, minmax(0, 1fr))` }}>

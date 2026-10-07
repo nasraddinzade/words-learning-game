@@ -7,7 +7,7 @@ import { TYPING_INPUT_ATTRS, useVisualViewportHeight } from '@/app/viewport';
 import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
 import { WordCard, type CardVerdict } from '@/components/WordCard';
-import { BALANCE } from '@/game/balance';
+import { BALANCE, comboTier } from '@/game/balance';
 import { isLastRound, type Round } from '@/game/session';
 import { TOTAL_WORDS } from '@/content/types';
 import { useDevStore } from '@/dev/devStore';
@@ -29,6 +29,15 @@ function verdictFor(correct: boolean, outcome: string, missed: boolean, kind: st
   return kind === 'type' ? 'typo' : 'wrong';
 }
 
+/** How long the learned word flies before the card appears. */
+const FLIGHT_MS = 800;
+
+interface Flight {
+  word: string;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+}
+
 export function Game() {
   const go = useNav((s) => s.go);
   const learned = useProfile((s) => s.profile.learnedCount);
@@ -41,6 +50,7 @@ export function Game() {
   const devEnabled = useDevStore((s) => s.enabled);
   const vvHeight = useVisualViewportHeight();
   const inputRef = useRef<HTMLInputElement>(null);
+  const learnedRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (phase === 'idle') go('setup');
@@ -53,7 +63,11 @@ export function Game() {
   const target = shownId ? entry(shownId) : undefined;
   const [shake, setShake] = useState(0);
   const [burst, setBurst] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [flight, setFlight] = useState<Flight | null>(null);
+  const [scorePop, setScorePop] = useState(0);
+  const [learnedPop, setLearnedPop] = useState(0);
   const isTyping = phase === 'playing' && round?.kind === 'type';
+  const lastTapRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (isTyping) inputRef.current?.focus();
@@ -62,13 +76,8 @@ export function Game() {
   const onTap = useCallback(
     (id: string, el: HTMLElement) => {
       if (useGame.getState().phase !== 'playing') return;
-      const r = useGame.getState().session?.round;
-      if (r && id === r.wordId) {
-        const rect = el.getBoundingClientRect();
-        setBurst({ id, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-      } else {
-        setShake((n) => n + 1);
-      }
+      const rect = el.getBoundingClientRect();
+      lastTapRef.current = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       tap(id, performance.now());
     },
     [tap],
@@ -79,20 +88,39 @@ export function Game() {
     return ph === 'playing' ? performance.now() - roundStartedAt : null;
   }, []);
 
-  // Typing feedback: a wrong word shakes, a correct one bursts from the chip. Driven by the
-  // store transition playing → card, so it fires once per answer.
+  // Feedback on the store transition playing → card, once per answer (SPEC §8.1).
   useEffect(
     () =>
       useGame.subscribe((s, prev) => {
         const r = s.lastResult;
-        if (s.phase !== 'card' || prev.phase !== 'playing' || !r || r.typed === null) return;
-        if (r.correct) {
-          const rect = document.querySelector('[data-testid="typing-word"]')?.getBoundingClientRect();
-          if (rect) setBurst({ id: `${r.wordId}-typed`, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-        } else if (r.lifeLost) setShake((n) => n + 1);
+        if (s.phase !== 'card' || prev.phase !== 'playing' || !r) return;
+        const chip = document.querySelector<HTMLElement>(r.typed !== null || r.missed ? '[data-testid="typing-word"], [data-testid="falling-word"][data-correct="true"]' : `[data-word-id="${r.wordId}"]`);
+        const rect = chip?.getBoundingClientRect();
+        const from = lastTapRef.current ?? (rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null);
+        lastTapRef.current = null;
+        if (r.correct && from) {
+          setBurst({ id: `${r.wordId}-${s.session?.roundsPlayed ?? 0}`, x: from.x, y: from.y });
+          setScorePop((n) => n + 1);
+        }
+        if (r.outcome === 'learned' && from) {
+          const counter = learnedRef.current?.getBoundingClientRect();
+          const word = useGame.getState().entry(r.wordId)?.word ?? '';
+          if (counter) setFlight({ word, from, to: { x: counter.left + counter.width / 2, y: counter.top + counter.height / 2 } });
+        }
+        if (!r.correct && r.lifeLost) setShake((n) => n + 1);
       }),
     [],
   );
+
+  // The learned word's flight ends with the counter ticking up.
+  useEffect(() => {
+    if (!flight) return;
+    const t = setTimeout(() => {
+      setFlight(null);
+      setLearnedPop((n) => n + 1);
+    }, FLIGHT_MS);
+    return () => clearTimeout(t);
+  }, [flight]);
 
   if (!session || phase === 'loading' || phase === 'idle') {
     return (
@@ -103,6 +131,8 @@ export function Game() {
   }
 
   const lastRound = isLastRound(session) || session.finished !== null;
+  const tier = comboTier(session.combo);
+  const showCard = phase === 'card' && lastResult && target && !flight;
 
   return (
     <main
@@ -112,18 +142,24 @@ export function Game() {
     >
       <div className={`flex min-h-0 flex-1 flex-col ${shake ? 'animate-shake' : ''}`} key={`shake-${shake}`}>
         <header className="flex min-h-14 items-center gap-3 px-3 pt-[env(safe-area-inset-top)] text-sm font-semibold">
-          <span data-testid="lives" data-lives={session.lives} aria-label={`${session.lives} lives`} className="text-lg tracking-tight">
+          <span data-testid="lives" data-lives={session.lives} aria-label={`${session.lives} lives`} className="flex text-lg tracking-tight">
             {Array.from({ length: BALANCE.lives }, (_, i) => (
-              <span key={i} className={i < session.lives ? 'text-heart' : 'text-muted/50'}>
+              <span key={i} className={i < session.lives ? 'text-heart' : `text-muted/50 ${i === session.lives ? 'animate-crack' : ''}`}>
                 {i < session.lives ? '♥' : '♡'}
               </span>
             ))}
           </span>
-          <span data-testid="combo" className={`rounded-full px-2 py-0.5 ${session.combo >= 5 ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted'}`}>
+          <span
+            data-testid="combo"
+            data-tier={tier}
+            className={`rounded-full px-2 py-0.5 transition-colors ${tier >= 2 ? 'bg-accent text-accent-ink shadow-glow' : tier === 1 ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted'}`}
+          >
             🔥 {session.combo}
           </span>
-          <span data-testid="score" className="tabular-nums">{formatCount(session.score)}</span>
-          <span data-testid="learned" className="ml-auto tabular-nums text-muted">
+          <span key={scorePop} data-testid="score" className={`tabular-nums ${scorePop ? 'animate-pop' : ''}`}>
+            {formatCount(session.score)}
+          </span>
+          <span ref={learnedRef} key={`learned-${learnedPop}`} data-testid="learned" className={`ml-auto tabular-nums ${learnedPop ? 'animate-pop text-accent' : 'text-muted'}`}>
             {formatCount(learned)}/{formatCount(TOTAL_WORDS)}
           </span>
           <Button variant="ghost" aria-label="Pause" data-testid="pause" className="min-w-12" onClick={() => pause(performance.now())}>
@@ -141,6 +177,7 @@ export function Game() {
           elapsed={elapsed}
           devEnabled={devEnabled}
           onFieldTap={() => inputRef.current?.focus()}
+          comboTier={tier}
         />
 
         <footer data-testid="explanation" className="relative min-h-24 border-t border-border bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
@@ -167,8 +204,17 @@ export function Game() {
       </div>
 
       {burst && <Burst key={burst.id} x={burst.x} y={burst.y} onDone={() => setBurst(null)} />}
+      {flight && (
+        <span
+          data-testid="learned-flight"
+          className="animate-fly pointer-events-none fixed z-30 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-accent px-4 py-2 text-xl font-black text-accent-ink shadow-glow"
+          style={{ left: flight.from.x, top: flight.from.y, ['--dx' as string]: `${flight.to.x - flight.from.x}px`, ['--dy' as string]: `${flight.to.y - flight.from.y}px` }}
+        >
+          {flight.word}
+        </span>
+      )}
 
-      {phase === 'card' && lastResult && target && (
+      {showCard && (
         <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto bg-bg/95" data-testid="card-overlay">
           <WordCard
             key={`${lastResult.wordId}-${session.roundsPlayed}`}
@@ -201,16 +247,16 @@ export function Burst({ x, y, onDone }: { x: number; y: number; onDone(): void }
     const t = setTimeout(onDone, 650);
     return () => clearTimeout(t);
   }, [onDone]);
-  const parts = Array.from({ length: 10 }, (_, i) => {
-    const angle = (i / 10) * Math.PI * 2;
-    return { dx: Math.cos(angle) * 60, dy: Math.sin(angle) * 60 - 40, delay: i * 12 };
+  const parts = Array.from({ length: 12 }, (_, i) => {
+    const angle = (i / 12) * Math.PI * 2;
+    return { dx: Math.cos(angle) * 64, dy: Math.sin(angle) * 64 - 40, delay: i * 10 };
   });
   return (
     <div className="pointer-events-none fixed inset-0 z-30" aria-hidden>
       {parts.map((p, i) => (
         <span
           key={i}
-          className="animate-particle absolute h-2.5 w-2.5 rounded-full bg-accent"
+          className="particle animate-particle absolute h-2.5 w-2.5 bg-accent"
           style={{ left: x, top: y, ['--dx' as string]: `${p.dx}px`, ['--dy' as string]: `${p.dy}px`, animationDelay: `${p.delay}ms` }}
         />
       ))}

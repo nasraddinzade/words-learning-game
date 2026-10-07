@@ -1,13 +1,14 @@
 import { mkdirSync } from 'node:fs';
 import { test } from '@playwright/test';
 import { APP_PATH, openFresh } from './helpers';
-import { continueCard, learningRow, localDay, readRound, startGame, tapCorrect, tapWrong, untilTyping, writeProgress } from './game';
+import { continueCard, learningRow, localDay, readRound, startGame, tapCorrect, tapWrong, untilTyping, writeProfile, writeProgress } from './game';
+import { THEMES } from '../src/app/themes';
 
 /**
  * Captures every screen and game state for the verification report (SPEC §13 step 3).
  * Files land in docs/verification/screenshots/<stage>/<project>-<name>.png.
  */
-const STAGE = process.env.STAGE ?? 'stage-2';
+const STAGE = process.env.STAGE ?? 'stage-3';
 const DIR = `docs/verification/screenshots/${STAGE}`;
 
 test('capture all screens', async ({ page }, testInfo) => {
@@ -77,9 +78,39 @@ test('capture all screens', async ({ page }, testInfo) => {
   await page.getByTestId('dev-toggle').click();
   await page.getByTestId('dev-learned-n').fill('1234');
   await page.getByTestId('dev-learned-set').click();
+  await shot('celebration-hundred');
+  await page.getByTestId('celebration-dismiss').click();
+  await shot('celebration-thousand');
+  await page.getByTestId('celebration-dismiss').click();
   await shot('dev-panel');
+  await page.getByTestId('dev-toggle').click();
   await page.goto(`${APP_PATH}#/map`);
   await shot('map');
   await page.goto(`${APP_PATH}#/settings`);
   await shot('settings');
+
+  // Summary with records, then every theme on Home and in a round (contrast check, SPEC 13.3).
+  await startGame(page, { seed: 'shots-record', speed: 1, newPerGame: 5, fresh: false });
+  await tapCorrect(page);
+  await continueCard(page);
+  await page.getByTestId('pause').click();
+  await page.getByTestId('quit').click();
+  await shot('summary-records');
+
+  if (testInfo.project.name === 'phone') {
+    for (const theme of THEMES) {
+      await writeProfile(page, { theme: theme.id, unlockedThemes: THEMES.map((t) => t.id) });
+      await page.goto(`${APP_PATH}#/`);
+      await page.reload();
+      await shot(`theme-${theme.id}-home`);
+      await startGame(page, { seed: `shots-${theme.id}`, speed: 1, newPerGame: 5, fresh: false });
+      await readRound(page);
+      await page.waitForTimeout(3500);
+      await shot(`theme-${theme.id}-game`);
+      await page.getByTestId('pause').click();
+      await page.getByTestId('quit').click();
+    }
+    await page.goto(`${APP_PATH}#/settings`);
+    await shot('settings-themes');
+  }
 });

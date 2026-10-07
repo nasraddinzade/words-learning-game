@@ -2,7 +2,10 @@ import { create } from 'zustand';
 import type { WordEntry } from '@/content/types';
 import { loadEntriesFor, pickFreshCandidates } from '@/content/loader';
 import { db } from '@/db/db';
-import { useProfile } from './profileStore';
+import { useProfile, type GameRecords } from './profileStore';
+import { playCorrect, playLearned, playWrong } from './sound';
+import { HAPTIC, vibrate } from './haptics';
+import { comboTier } from '@/game/balance';
 import { appClock } from './clock';
 import { useDevStore } from '@/dev/devStore';
 import { createRng, randomSeed } from '@/engine/rng';
@@ -26,6 +29,8 @@ interface GameStore {
   /** Letters typed so far in a typing round. */
   typed: string;
   quitEarly: boolean;
+  /** Personal bests beaten by the finished game (SPEC §8.2). */
+  records: GameRecords | null;
   error: string | null;
 
   start(): Promise<void>;
@@ -53,14 +58,17 @@ export const useGame = create<GameStore>((set, get) => ({
   lastResult: null,
   typed: '',
   quitEarly: false,
+  records: null,
   error: null,
 
   start: async () => {
-    set({ phase: 'loading', error: null, lastResult: null, quitEarly: false });
+    set({ phase: 'loading', error: null, lastResult: null, quitEarly: false, records: null });
     try {
       const { profile } = useProfile.getState();
       const dev = useDevStore.getState();
       const today = appClock.today();
+      // Starting a game counts as playing today (streak, SPEC §8.2).
+      await useProfile.getState().recordPlay(today);
       const progress = await db.progress.toArray();
       const seen = new Set(progress.map((p) => p.wordId));
       const candidates = await pickFreshCandidates(levelOrder(profile.settings.startLevel), seen, profile.settings.newPerGame);
@@ -103,11 +111,16 @@ export const useGame = create<GameStore>((set, get) => ({
     const { session, ctx, phase } = get();
     if (!session || !ctx || phase !== 'card') return;
     if (session.finished) {
-      set({ phase: 'finished' });
+      finish(get, set, false);
       return;
     }
     const next = startRound(session, ctx);
-    set({ session: next, phase: next.finished ? 'finished' : 'playing', roundStartedAt: now, lastResult: null, typed: '' });
+    if (next.finished) {
+      set({ session: next });
+      finish(get, set, false);
+      return;
+    }
+    set({ session: next, phase: 'playing', roundStartedAt: now, lastResult: null, typed: '' });
   },
 
   pause: (now) => {
@@ -124,7 +137,8 @@ export const useGame = create<GameStore>((set, get) => ({
   quit: () => {
     const { session } = get();
     if (!session) return;
-    set({ phase: 'finished', quitEarly: true, session: { ...session, round: null } });
+    set({ session: { ...session, round: null } });
+    finish(get, set, true);
   },
 
   entry: (id) => get().ctx?.entries.get(id),
@@ -150,10 +164,30 @@ function resolve(get: () => GameStore, set: (s: Partial<GameStore>) => void, inp
   const { state, result } = answer(session, ctx, { ...input, elapsedFraction: fraction, today: appClock.today(), rng: ctx.rng });
   set({ session: state, lastResult: result, phase: 'card' });
 
+  // Feedback (SPEC §8.1, §8.4).
+  if (result.outcome === 'learned') {
+    playLearned();
+    vibrate(HAPTIC.learned);
+  } else if (result.correct) {
+    playCorrect(comboTier(session.combo));
+    vibrate(HAPTIC.tap);
+  } else if (result.lifeLost) {
+    playWrong();
+    vibrate(HAPTIC.wrong);
+  }
+
   // Persist after every answer (SPEC §5.6). Failures are logged, never block play.
   void db.progress.put(result.progress).catch((e: unknown) => console.error('progress save failed', e));
-  if (result.learnedDelta !== 0) {
-    const profile = useProfile.getState();
-    void profile.update({ learnedCount: Math.max(0, profile.profile.learnedCount + result.learnedDelta) });
-  }
+  if (result.learnedDelta !== 0) void useProfile.getState().addLearned(result.learnedDelta);
+}
+
+/** Ends the game: records personal bests once, then shows the summary. */
+function finish(get: () => GameStore, set: (s: Partial<GameStore>) => void, quitEarly: boolean): void {
+  const { session } = get();
+  if (!session) return;
+  set({ phase: 'finished', quitEarly });
+  void useProfile
+    .getState()
+    .recordGameEnd(session.score, session.bestCombo)
+    .then((records) => set({ records }));
 }

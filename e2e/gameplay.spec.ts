@@ -108,7 +108,7 @@ test.describe('gameplay', () => {
     await expect(page.getByTestId('summary-title')).toHaveText('Round complete');
     await expect(page.getByTestId('stat-moved-up')).toHaveText('5');
     await expect(page.getByTestId('stat-came-back')).toHaveText('0');
-    await expect(page.getByTestId('stat-best-combo')).toHaveText('×5');
+    await expect(page.getByTestId('stat-best-combo')).toContainText('×5');
     await page.getByTestId('go-home').click();
     await expect(page.getByTestId('due-today')).toHaveText('0');
   });

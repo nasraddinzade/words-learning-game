@@ -195,3 +195,52 @@ export async function isTypingRound(page: Page): Promise<boolean> {
   await expect(page.locator('[data-testid="typing-word"], [data-testid="falling-word"]').first()).toBeAttached();
   return (await page.getByTestId('typing-word').count()) > 0;
 }
+
+export interface ProfilePatch {
+  learnedCount?: number;
+  streak?: number;
+  freezes?: number;
+  lastPlayedDay?: string | null;
+  bestCombo?: number;
+  bestScore?: number;
+  unlockedThemes?: string[];
+  theme?: string;
+}
+
+/** Merges fields into the stored profile row (IndexedDB 'profile', key 'me'). Reload afterwards. */
+export async function writeProfile(page: Page, patch: ProfilePatch): Promise<void> {
+  await page.evaluate(
+    ({ dbName, patch }) =>
+      new Promise<void>((resolve, reject) => {
+        const req = indexedDB.open(dbName);
+        req.onerror = () => reject(req.error);
+        req.onsuccess = () => {
+          const db = req.result;
+          const tx = db.transaction('profile', 'readwrite');
+          const store = tx.objectStore('profile');
+          const get = store.get('me');
+          get.onsuccess = () => {
+            const base = (get.result as Record<string, unknown> | undefined) ?? {
+              id: 'me',
+              learnedCount: 0,
+              streak: 0,
+              freezes: 0,
+              lastPlayedDay: null,
+              bestCombo: 0,
+              bestScore: 0,
+              unlockedThemes: ['neon'],
+              theme: 'neon',
+              settings: { startLevel: 'B2', newPerGame: 10, sound: true, vibration: true, autoSpeak: true, voice: null },
+            };
+            store.put({ ...base, ...patch, id: 'me' });
+          };
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+    { dbName: DB_NAME, patch },
+  );
+}

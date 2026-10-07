@@ -19,7 +19,66 @@
   --ok: #4ade80;
   --heart: #ff4d6d;
   --glow: 0 0 24px rgba(56, 240, 200, 0.35);
+  --particle-radius: 50%;
+  --particle-2: #ff5ea8;
 }
+/* Nine more themes (SPEC §8.2). Each keeps light text on a dark background; only the hues and the
+   particle look change. --particle-radius: 50% = dots, 10% = sparks. */
+[data-theme='ember'] {
+  --bg: #170c0a; --bg-2: #22110d; --surface: #2d1712; --surface-2: #3f2119; --border: #5a2f23;
+  --text: #fff4ee; --muted: #c9a195; --accent: #ff7a3d; --accent-ink: #2a0d03; --accent-2: #ffd166;
+  --warn: #ffd166; --danger: #ff5c5c; --ok: #7bd389; --heart: #ff5c5c;
+  --glow: 0 0 24px rgba(255, 122, 61, 0.4); --particle-radius: 10%; --particle-2: #ffd166;
+}
+[data-theme='ocean'] {
+  --bg: #061420; --bg-2: #0a1d2e; --surface: #10283d; --surface-2: #173752; --border: #234b6b;
+  --text: #eef8ff; --muted: #92b4cc; --accent: #4cc9ff; --accent-ink: #04202e; --accent-2: #7ef0c4;
+  --warn: #ffd166; --danger: #ff6b8a; --ok: #5fe3a1; --heart: #ff6b8a;
+  --glow: 0 0 24px rgba(76, 201, 255, 0.38); --particle-radius: 50%; --particle-2: #7ef0c4;
+}
+[data-theme='violet'] {
+  --bg: #120a1f; --bg-2: #1a0f2e; --surface: #24163d; --surface-2: #322053; --border: #4a316f;
+  --text: #f7f1ff; --muted: #b3a1cf; --accent: #c77dff; --accent-ink: #1f0636; --accent-2: #ff8fd8;
+  --warn: #ffd166; --danger: #ff5c8a; --ok: #8ae9b0; --heart: #ff5c8a;
+  --glow: 0 0 26px rgba(199, 125, 255, 0.4); --particle-radius: 50%; --particle-2: #ff8fd8;
+}
+[data-theme='forest'] {
+  --bg: #0a1510; --bg-2: #0f1f17; --surface: #162a20; --surface-2: #1f3a2c; --border: #2f5440;
+  --text: #f0fff5; --muted: #9cc3ab; --accent: #6ee7a0; --accent-ink: #052913; --accent-2: #f4e36b;
+  --warn: #f4e36b; --danger: #ff6a6a; --ok: #6ee7a0; --heart: #ff6a6a;
+  --glow: 0 0 24px rgba(110, 231, 160, 0.38); --particle-radius: 50%; --particle-2: #f4e36b;
+}
+[data-theme='sunset'] {
+  --bg: #1a0b16; --bg-2: #261021; --surface: #33172c; --surface-2: #47203c; --border: #65305a;
+  --text: #fff3f8; --muted: #cf9fbc; --accent: #ff9e5e; --accent-ink: #331106; --accent-2: #ff5e9c;
+  --warn: #ffd166; --danger: #ff5e7a; --ok: #8ce3a6; --heart: #ff5e7a;
+  --glow: 0 0 24px rgba(255, 158, 94, 0.4); --particle-radius: 10%; --particle-2: #ff5e9c;
+}
+[data-theme='candy'] {
+  --bg: #15101c; --bg-2: #1e1628; --surface: #2a1f38; --surface-2: #3a2b4d; --border: #54406d;
+  --text: #fff6fb; --muted: #c6afd6; --accent: #ff7ad9; --accent-ink: #36082a; --accent-2: #7cf2ff;
+  --warn: #fff07a; --danger: #ff5b7f; --ok: #7af5c0; --heart: #ff5b7f;
+  --glow: 0 0 26px rgba(255, 122, 217, 0.4); --particle-radius: 50%; --particle-2: #7cf2ff;
+}
+[data-theme='mono'] {
+  --bg: #0e0e10; --bg-2: #161618; --surface: #1f1f23; --surface-2: #2b2b31; --border: #3f3f47;
+  --text: #fafafa; --muted: #a3a3ad; --accent: #e6e6ec; --accent-ink: #111114; --accent-2: #9d9daa;
+  --warn: #e3d27a; --danger: #ff6b6b; --ok: #9be39b; --heart: #ff6b6b;
+  --glow: 0 0 22px rgba(230, 230, 236, 0.3); --particle-radius: 10%; --particle-2: #9d9daa;
+}
+[data-theme='gold'] {
+  --bg: #15110a; --bg-2: #1f190d; --surface: #2b2312; --surface-2: #3c3119; --border: #5a4a26;
+  --text: #fff9ea; --muted: #cbb98c; --accent: #ffd166; --accent-ink: #2d1f00; --accent-2: #ff9f4d;
+  --warn: #ffd166; --danger: #ff6a6a; --ok: #9ee493; --heart: #ff6a6a;
+  --glow: 0 0 26px rgba(255, 209, 102, 0.42); --particle-radius: 10%; --particle-2: #ff9f4d;
+}
+[data-theme='aurora'] {
+  --bg: #070f1a; --bg-2: #0c1728; --surface: #122239; --surface-2: #1a304f; --border: #28476d;
+  --text: #f1fbff; --muted: #9ab8d1; --accent: #7cffb2; --accent-ink: #042315; --accent-2: #b48cff;
+  --warn: #ffe17a; --danger: #ff6b9c; --ok: #7cffb2; --heart: #ff6b9c;
+  --glow: 0 0 28px rgba(124, 255, 178, 0.4); --particle-radius: 50%; --particle-2: #b48cff;
+}
+
 
 @theme inline {
   --color-bg: var(--bg);
@@ -38,6 +97,7 @@
   --color-heart: var(--heart);
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --shadow-glow: var(--glow);
+  --color-particle-2: var(--particle-2);
 }
 
 html,
@@ -95,4 +155,53 @@ body {
 }
 .animate-particle {
   animation: particle 0.6s ease-out forwards;
+}
+
+/* Combo escalation (SPEC §8.1): the field glows and its background drifts faster at 5, 10, 20. */
+@keyframes field-drift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+.field-combo {
+  background-image: radial-gradient(60% 40% at 30% 20%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+    radial-gradient(50% 50% at 80% 80%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 70%);
+  background-size: 200% 200%;
+  animation: field-drift 24s linear infinite alternate;
+}
+.field-combo[data-combo-tier='1'] { animation-duration: 12s; box-shadow: inset 0 0 40px color-mix(in srgb, var(--accent) 12%, transparent); }
+.field-combo[data-combo-tier='2'] { animation-duration: 6s; box-shadow: inset 0 0 70px color-mix(in srgb, var(--accent) 20%, transparent); }
+.field-combo[data-combo-tier='3'] { animation-duration: 3s; box-shadow: inset 0 0 110px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+.particle {
+  border-radius: var(--particle-radius, 50%);
+}
+.particle:nth-child(odd) {
+  background: var(--particle-2);
+}
+
+/* A learned word flies into the counter (SPEC §8.1). */
+@keyframes fly {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate3d(var(--dx), var(--dy), 0) scale(0.3); opacity: 0; }
+}
+.animate-fly {
+  animation: fly 0.75s cubic-bezier(0.5, 0, 0.8, 0.4) forwards;
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: pop 0.45s ease-out 1;
+}
+@keyframes crack {
+  0% { transform: scale(1) rotate(0); }
+  30% { transform: scale(1.3) rotate(-12deg); }
+  60% { transform: scale(0.9) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.animate-crack {
+  animation: crack 0.5s ease-out 1;
 }

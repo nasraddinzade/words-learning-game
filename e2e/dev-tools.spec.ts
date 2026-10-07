@@ -52,6 +52,10 @@ test.describe('dev tools', () => {
     await page.getByTestId('dev-toggle').click();
     await page.getByTestId('dev-learned-n').fill('250');
     await page.getByTestId('dev-learned-set').click();
+    // 250 crosses 200: the celebration shows first (stage 3).
+    await expect(page.getByTestId('celebration-value')).toHaveText('200');
+    await page.getByTestId('celebration-dismiss').click();
+    await page.getByTestId('dev-toggle').click();
     await expect(page.getByTestId('learned-count')).toContainText('250 / 10 000');
 
     await page.getByTestId('nav-map').click();
