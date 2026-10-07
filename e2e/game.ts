@@ -38,8 +38,16 @@ async function tapChip(page: Page, id: string): Promise<void> {
   await expect(page.getByTestId('card-overlay')).toBeVisible();
 }
 
-export async function tapCorrect(page: Page): Promise<RoundView> {
+/**
+ * Taps the correct chip. By default it waits past the first third of the fall first, so the tap
+ * does not count as a fast tap (SPEC §6.3). Pass `fast` to tap as soon as the chip is visible.
+ */
+export async function tapCorrect(page: Page, opts: { fast?: boolean } = {}): Promise<RoundView> {
   const round = await readRound(page);
+  if (!opts.fast) {
+    await expect(page.locator(`[data-testid="falling-word"][data-word-id="${round.correctId}"]`)).toHaveCSS('opacity', '1');
+    await page.waitForTimeout(2000);
+  }
   await tapChip(page, round.correctId);
   await expect(page.getByTestId('word-card')).toHaveAttribute('data-verdict', 'correct');
   return round;
@@ -69,6 +77,9 @@ export interface ProgressRow {
   lapses: number;
   confusedWith: string[];
   flagged: boolean;
+  skipCandidate?: boolean;
+  learnedDay?: string | null;
+  checksPassed?: number;
 }
 
 export async function readProgress(page: Page): Promise<Record<string, ProgressRow>> {
@@ -129,3 +140,58 @@ export const localDay = (offset = 0) => {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
+
+/** Types into the hidden input of a typing round; auto-submits when the word length is reached. */
+export async function typeWord(page: Page, text: string, submit = false): Promise<void> {
+  const input = page.getByTestId('typing-input');
+  await expect(input).toBeAttached();
+  await expect(page.getByTestId('typing-word')).toHaveCSS('opacity', '1');
+  await input.fill(text);
+  if (submit) await input.press('Enter');
+}
+
+export const learningRow = (wordId: string, step: 1 | 2 | 3 | 4, dueDay: string, extra: Partial<ProgressRow> = {}): ProgressRow => ({
+  wordId,
+  step,
+  status: 'learning',
+  dueDay,
+  lastAdvanceDay: null,
+  inDebt: false,
+  lapses: 0,
+  confusedWith: [],
+  flagged: false,
+  ...extra,
+});
+
+/** Plays correct tap rounds until a typing round is on the field (max `max` rounds). */
+export async function untilTyping(page: Page, opts: { fast?: boolean; max?: number } = {}): Promise<string> {
+  const max = opts.max ?? 8;
+  for (let i = 0; i < max; i++) {
+    await expect(page.locator('[data-testid="typing-word"], [data-testid="falling-word"]').first()).toBeAttached();
+    if ((await page.getByTestId('typing-word').count()) > 0) {
+      return (await page.getByTestId('typing-word').getAttribute('data-word-id')) ?? '';
+    }
+    await tapCorrect(page, { fast: opts.fast });
+    await continueCard(page);
+  }
+  throw new Error('no typing round appeared');
+}
+
+/** Answers whatever round is on the field, tap or typing. Returns the hidden word's id. */
+export async function answerRound(page: Page, correct: boolean, words: ReadonlyMap<string, { word: string }>): Promise<string> {
+  await expect(page.locator('[data-testid="typing-word"], [data-testid="falling-word"]').first()).toBeAttached();
+  if ((await page.getByTestId('typing-word').count()) > 0) {
+    const id = (await page.getByTestId('typing-word').getAttribute('data-word-id')) ?? '';
+    const word = words.get(id)?.word ?? '';
+    await typeWord(page, correct ? word : 'x'.repeat(word.length));
+    await expect(page.getByTestId('card-overlay')).toBeVisible();
+    return id;
+  }
+  return correct ? (await tapCorrect(page)).correctId : (await tapWrong(page)).correctId;
+}
+
+/** True when the current round is a typing round. */
+export async function isTypingRound(page: Page): Promise<boolean> {
+  await expect(page.locator('[data-testid="typing-word"], [data-testid="falling-word"]').first()).toBeAttached();
+  return (await page.getByTestId('typing-word').count()) > 0;
+}
