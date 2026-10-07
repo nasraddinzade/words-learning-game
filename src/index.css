@@ -157,6 +157,13 @@ body {
   animation: particle 0.6s ease-out forwards;
 }
 
+/* Number badges on chips, only where a keyboard is likely (SPEC §12). */
+@media (hover: hover) and (pointer: fine) {
+  .key-badge {
+    display: flex;
+  }
+}
+
 /* Combo escalation (SPEC §8.1): the field glows and its background drifts faster at 5, 10, 20. */
 @keyframes field-drift {
   0% { background-position: 0% 0%; }

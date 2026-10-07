@@ -139,6 +139,9 @@ export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEna
               style={{ left: `calc(${f.lane * laneWidth}% + 4px)`, width: `calc(${laneWidth}% - 8px)`, opacity: 0, transform: `translateY(-${CHIP_H + 8}px)` }}
             >
               <span className="px-1 leading-tight break-words">{e.word}</span>
+              <span className="key-badge absolute -top-2 -left-1 hidden h-5 min-w-5 items-center justify-center rounded-full bg-bg-2 px-1 text-[11px] font-bold text-muted" aria-hidden>
+                {round.fall.findIndex((x) => x.id === f.id) + 1}
+              </span>
             </button>
           );
         })}
