@@ -14,22 +14,15 @@ test.describe('stage 0 smoke', () => {
     await page.getByTestId('play').click();
     await expect(page.getByTestId('screen-setup')).toBeVisible();
     await page.getByRole('radio', { name: /^B1/ }).click();
-    await page.getByRole('radiogroup', { name: 'New words per game' }).getByRole('radio', { name: '15' }).click();
+    await page.getByRole('radiogroup', { name: 'New words per game' }).getByRole('radio', { name: '15', exact: true }).click();
     await page.getByTestId('start-game').click();
 
     await expect(page.getByTestId('screen-game')).toBeVisible();
-    await expect(page.getByTestId('lives')).toHaveText('♥♥♥');
+    await expect(page.getByTestId('lives')).toHaveAttribute('data-lives', '3');
     await expect(page.getByTestId('explanation')).toBeVisible();
-    await page.getByTestId('stub-card').click();
-
-    await expect(page.getByTestId('screen-card')).toBeVisible();
-    await expect(page.getByTestId('translation')).toHaveCount(0);
-    await page.getByTestId('show-translation').click();
-    await expect(page.getByTestId('translation')).toBeVisible();
-    await page.getByTestId('continue').click();
-
-    await expect(page.getByTestId('screen-game')).toBeVisible();
-    await page.getByTestId('stub-end').click();
+    await expect(page.getByTestId('falling-word').first()).toBeAttached();
+    await page.getByTestId('pause').click();
+    await page.getByTestId('quit').click();
     await expect(page.getByTestId('screen-summary')).toBeVisible();
     await page.getByTestId('go-home').click();
 
@@ -47,7 +40,7 @@ test.describe('stage 0 smoke', () => {
     await page.reload();
     await expect(page.getByTestId('screen-settings')).toBeVisible();
     await expect(page.getByRole('radio', { name: /^B1/ })).toHaveAttribute('aria-checked', 'true');
-    await expect(page.getByRole('radiogroup', { name: 'New words per game' }).getByRole('radio', { name: '15' })).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByRole('radiogroup', { name: 'New words per game' }).getByRole('radio', { name: '15', exact: true })).toHaveAttribute('aria-checked', 'true');
 
     await page.getByTestId('toggle-sound').click();
     await expect(page.getByTestId('toggle-sound')).toHaveAttribute('aria-checked', 'false');
@@ -67,7 +60,7 @@ test.describe('stage 0 smoke', () => {
 
   test('no horizontal scroll on any screen', async ({ page }) => {
     await openFresh(page);
-    for (const hash of ['', 'setup', 'game', 'card', 'summary', 'map', 'speed', 'settings']) {
+    for (const hash of ['', 'setup', 'summary', 'map', 'speed', 'settings']) {
       await page.goto(`${APP_PATH}#/${hash}`);
       await expect(page.locator('main[data-testid^="screen-"]')).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

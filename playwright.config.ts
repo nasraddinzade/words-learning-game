@@ -40,6 +40,7 @@ export default defineConfig({
     },
     {
       name: 'phone-small',
+      testIgnore: /learning\.spec\.ts/,
       use: {
         ...devices['Pixel 7'],
         viewport: { width: 360, height: 800 },
@@ -51,6 +52,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
+      testIgnore: /learning\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
   ],
