@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react';
 import { useNav } from '@/app/nav';
+import { appClock } from '@/app/clock';
+import { db } from '@/db/db';
+import { countDue } from '@/engine/queue';
 import { useProfile } from '@/app/profileStore';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
@@ -8,8 +12,17 @@ import { formatCount as fmt } from '@/app/format';
 export function Home() {
   const go = useNav((s) => s.go);
   const profile = useProfile((s) => s.profile);
-  // Due-today count arrives with the engine in stage 1.
-  const dueToday = 0;
+  const [dueToday, setDueToday] = useState<number | null>(null);
+  useEffect(() => {
+    let alive = true;
+    db.progress
+      .toArray()
+      .then((rows) => alive && setDueToday(countDue(rows, appClock.today())))
+      .catch(() => alive && setDueToday(0));
+    return () => {
+      alive = false;
+    };
+  }, [profile.learnedCount]);
 
   return (
     <Screen testId="screen-home">
@@ -29,7 +42,7 @@ export function Home() {
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-2xl border border-border bg-surface p-4 text-center">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Due today</p>
-              <p className="mt-1 text-2xl font-bold tabular-nums" data-testid="due-today">{dueToday}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums" data-testid="due-today">{dueToday ?? '…'}</p>
             </div>
             <div className="rounded-2xl border border-border bg-surface p-4 text-center">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Streak</p>

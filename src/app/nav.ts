@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export const SCREENS = ['home', 'setup', 'game', 'card', 'summary', 'map', 'speed', 'settings'] as const;
+export const SCREENS = ['home', 'setup', 'game', 'summary', 'map', 'speed', 'settings'] as const;
 export type Screen = (typeof SCREENS)[number];
 
 function isScreen(value: string): value is Screen {

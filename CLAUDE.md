@@ -25,7 +25,8 @@ npm run icons          # regenerate PWA PNG icons from public/icons/icon.svg
 
 - UI text is English only. Russian appears only in `translation` of a word entry.
 - `src/engine/` and `src/game/` are pure modules: no React, no DOM globals. Time (`now`, current day) and RNG are passed in as parameters.
-- All tuning numbers live in `src/game/balance.ts`.
+- All game-feel numbers live in `src/game/balance.ts`; learning-logic constants in `src/engine/rules.ts`.
+- Layers: `src/engine` (scheduler, queue) → `src/game` (session, distractors, fall) → `src/app` stores → screens. Lower layers never import higher ones.
 - Game loop on `requestAnimationFrame`; falling words are DOM elements moved with `transform`.
 - Dev-only tools (`?seed=`, `?speed=`, dev panel) are gated by `isDevToolsEnabled()` in `src/dev/enabled.ts`. They exist in `vite dev` and in `build:e2e`, never in the production build.
 - Progress is written to IndexedDB after every answer. Never block play because of mistakes or missed days.
@@ -47,5 +48,6 @@ A stage is done only after: `npm run check` is clean, the game was played in a r
 
 1. Read `docs/words/PROGRESS.md` and `docs/words/SOURCE.md`; continue from the first range not marked done.
 2. Entries are written strictly by `docs/words/master-list.tsv`, in batches of 250, order of levels B2 → C1 → B1 → A2 → A1, files of 500 in `src/content/words/NNNNN-NNNNN.json`.
-3. Before committing a batch: `npm run validate-words`, then read 25 random entries critically and fix them; write `docs/words/batch-NNNNN.md`.
+3. Before committing a batch: `npm run validate-words` (also regenerates `manifest.json` and `word-index.json`), then read 25 random entries critically and fix them; write `docs/words/batch-NNNNN.md`.
+   `avoid` may only name words that exist in the base with the same pos; list every neighbour that also fits the definition.
 4. Bad cards flagged by the player arrive in an export file; fix them in a separate commit and log in `docs/words/fixes.md`.

@@ -10,7 +10,6 @@ const DevPanel = DEV_TOOLS ? lazy(() => import('@/dev/DevPanel').then((m) => ({ 
 import { Home } from '@/screens/Home';
 import { Setup } from '@/screens/Setup';
 import { Game } from '@/screens/Game';
-import { WordCard } from '@/screens/WordCard';
 import { Summary } from '@/screens/Summary';
 import { ProgressMap } from '@/screens/ProgressMap';
 import { SpeedCheck } from '@/screens/SpeedCheck';
@@ -20,7 +19,6 @@ const SCREEN_COMPONENTS: Record<Screen, () => React.JSX.Element> = {
   home: Home,
   setup: Setup,
   game: Game,
-  card: WordCard,
   summary: Summary,
   map: ProgressMap,
   speed: SpeedCheck,
