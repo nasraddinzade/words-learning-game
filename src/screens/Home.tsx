@@ -47,7 +47,12 @@ export function Home() {
             <div className="rounded-2xl border border-border bg-surface p-4 text-center">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Streak</p>
               <p className="mt-1 text-2xl font-bold tabular-nums" data-testid="streak">
-                {profile.streak} <span className="text-base font-medium text-muted">days</span>
+                {profile.streak} <span className="text-base font-medium text-muted">{profile.streak === 1 ? 'day' : 'days'}</span>
+                {profile.freezes > 0 && (
+                  <span className="ml-2 text-base font-medium text-accent" data-testid="freezes" title="Freezes: a missed day does not break the streak">
+                    {profile.freezes} ❄
+                  </span>
+                )}
               </p>
             </div>
           </div>

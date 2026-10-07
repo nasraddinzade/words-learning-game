@@ -14,6 +14,7 @@ import { Summary } from '@/screens/Summary';
 import { ProgressMap } from '@/screens/ProgressMap';
 import { SpeedCheck } from '@/screens/SpeedCheck';
 import { Settings } from '@/screens/Settings';
+import { Celebration } from '@/components/Celebration';
 
 const SCREEN_COMPONENTS: Record<Screen, () => React.JSX.Element> = {
   home: Home,
@@ -30,6 +31,7 @@ export default function App() {
   const status = useProfile((s) => s.status);
   const init = useProfile((s) => s.init);
   const theme = useProfile((s) => s.profile.theme);
+  const celebration = useProfile((s) => s.celebrations[0]);
   const devEnabled = useDevStore((s) => s.enabled);
 
   useEffect(() => {
@@ -52,6 +54,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <Current />
+      {celebration && <Celebration key={`${celebration.kind}-${celebration.value}`} item={celebration} />}
       {devEnabled && DevPanel && (
         <Suspense fallback={null}>
           <DevPanel />

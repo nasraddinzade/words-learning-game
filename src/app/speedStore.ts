@@ -4,6 +4,8 @@ import { LEVELS } from '@/content/types';
 import { loadEntriesFor, pickUnseenOfLevels } from '@/content/loader';
 import { db } from '@/db/db';
 import { useProfile } from './profileStore';
+import { playLearned } from './sound';
+import { HAPTIC, vibrate } from './haptics';
 import { appClock } from './clock';
 import { useDevStore } from '@/dev/devStore';
 import { BALANCE } from '@/game/balance';
@@ -49,6 +51,7 @@ export const useSpeed = create<SpeedStore>((set, get) => ({
       const seen = new Set(progress.filter((p) => p.status !== 'new').map((p) => p.wordId));
       const ids = await pickUnseenOfLevels(below, seen, BALANCE.speedCheckBatch);
       const { entries } = await loadEntriesFor(ids);
+      if (ids.length > 0) await useProfile.getState().recordPlay(appClock.today());
       const state = nextSpeedWord(createSpeedCheck(ids, dev.params.speed));
       set({ state, entries, levels: below.slice(), phase: state.finished ? 'finished' : 'playing', roundStartedAt: performance.now(), typed: '' });
     } catch (e) {
@@ -76,8 +79,9 @@ export const useSpeed = create<SpeedStore>((set, get) => ({
     set({ state: next, phase: 'feedback', last: { wordId: entry.id, outcome, typed } });
     void db.progress.put(progress).catch((e: unknown) => console.error('progress save failed', e));
     if (outcome === 'learned') {
-      const p = useProfile.getState();
-      void p.update({ learnedCount: p.profile.learnedCount + 1 });
+      playLearned();
+      vibrate(HAPTIC.learned);
+      void useProfile.getState().addLearned(1);
     }
   },
 
