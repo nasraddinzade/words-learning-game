@@ -109,3 +109,49 @@ describe('addConfusion', () => {
     expect(addConfusion(p, 'w').confusedWith).toEqual(p.confusedWith);
   });
 });
+
+import { applySkipCheck, markSkipCandidate, matchesTyped, revealedLettersFor, roundKindFor } from './scheduler';
+
+describe('round format', () => {
+  it('maps steps to tap or type and reveals the first letter on step 3', () => {
+    expect(roundKindFor(1)).toBe('tap');
+    expect(roundKindFor(2)).toBe('tap');
+    expect(roundKindFor(3)).toBe('type');
+    expect(roundKindFor(4)).toBe('type');
+    expect(revealedLettersFor(3)).toBe(1);
+    expect(revealedLettersFor(4)).toBe(0);
+    expect(revealedLettersFor(1)).toBe(0);
+  });
+
+  it('matches typed answers against the word and accepted spellings only', () => {
+    expect(matchesTyped('Colour ', 'colour', ['color'])).toBe(true);
+    expect(matchesTyped('color', 'colour', ['color'])).toBe(true);
+    expect(matchesTyped('colr', 'colour', ['color'])).toBe(false);
+    expect(matchesTyped('', 'colour')).toBe(false);
+  });
+});
+
+describe('skip check', () => {
+  it('learns the word at once when typed correctly', () => {
+    const p = markSkipCandidate(applyAnswer(newProgress('w'), true, D0).progress);
+    expect(p.skipCandidate).toBe(true);
+    const r = applySkipCheck(p, true, D0);
+    expect(r.outcome).toBe('learned');
+    expect(r.learnedDelta).toBe(1);
+    expect(r.progress.status).toBe('learned');
+    expect(r.progress.skipCandidate).toBe(false);
+    expect(r.progress.dueDay).toBe(addDays(D0, 21));
+  });
+
+  it('keeps the normal path without penalty when not typed', () => {
+    const p = markSkipCandidate(applyAnswer(newProgress('w'), true, D0).progress);
+    const r = applySkipCheck(p, false, D0);
+    expect(r.outcome).toBe('skipFailed');
+    expect(r.learnedDelta).toBe(0);
+    expect(r.progress.step).toBe(2);
+    expect(r.progress.inDebt).toBe(false);
+    expect(r.progress.lapses).toBe(0);
+    expect(r.progress.dueDay).toBe(addDays(D0, 1));
+    expect(r.progress.skipCandidate).toBe(false);
+  });
+});

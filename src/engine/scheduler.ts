@@ -12,7 +12,8 @@ export type AnswerOutcome =
   | 'lapsed' // wrong: down one step, in debt
   | 'passedCheck' // learned word passed a control check
   | 'retired' // passed the last control check
-  | 'failedCheck'; // learned word failed a control check
+  | 'failedCheck' // learned word failed a control check
+  | 'skipFailed'; // skip check not typed: no penalty, normal path continues
 
 export interface AnswerResult {
   progress: WordProgress;
@@ -45,6 +46,44 @@ export function playStep(p: WordProgress): PlayStep {
   return p.step as PlayStep;
 }
 
+export type RoundKind = 'tap' | 'type';
+
+/** Steps 1-2 are tap rounds, 3-4 (and control checks) are typing rounds (SPEC §5, §6.1). */
+export function roundKindFor(step: PlayStep): RoundKind {
+  return step >= 3 ? 'type' : 'tap';
+}
+
+/** How many leading letters a typing round reveals: step 3 shows the first one (SPEC §5.2). */
+export function revealedLettersFor(step: PlayStep): number {
+  return step === 3 ? 1 : 0;
+}
+
+/** Case-insensitive match against the word or one of its accepted spellings (SPEC §5.2). */
+export function matchesTyped(typed: string, word: string, accept: readonly string[] = []): boolean {
+  const t = typed.trim().toLowerCase();
+  if (t.length === 0) return false;
+  return t === word.toLowerCase() || accept.some((a) => a.toLowerCase() === t);
+}
+
+/** A new word tapped correctly within the first third of its fall becomes a skip candidate (SPEC §6.3). */
+export function markSkipCandidate(p: WordProgress): WordProgress {
+  return { ...p, skipCandidate: true };
+}
+
+/**
+ * The skip check (SPEC §6.3): a typing round without hints a few rounds after a fast tap.
+ * Typed correctly → learned at once. Otherwise no life is lost and the word follows the normal
+ * path from step 2 (which the fast tap already set up for tomorrow).
+ */
+export function applySkipCheck(p: WordProgress, correct: boolean, today: DayString): AnswerResult {
+  if (!correct) return { progress: { ...p, skipCandidate: false }, outcome: 'skipFailed', learnedDelta: 0 };
+  return {
+    progress: { ...p, step: 4, status: 'learned', skipCandidate: false, inDebt: false, learnedDay: today, lastAdvanceDay: today, dueDay: addDays(today, CHECK_INTERVAL_DAYS[0]), checksPassed: 0 },
+    outcome: 'learned',
+    learnedDelta: 1,
+  };
+}
+
 /**
  * Applies one answer (SPEC §6.1, §6.2, §6.5). Pure: `today` is the local calendar day.
  * - at most one step up per calendar day
@@ -64,7 +103,7 @@ export function applyAnswer(p: WordProgress, correct: boolean, today: DayString)
   }
 
   if (p.inDebt) {
-    return { progress: { ...p, inDebt: false, dueDay: addDays(today, 1), status: 'learning' }, outcome: 'debtCleared', learnedDelta: 0 };
+    return { progress: { ...p, inDebt: false, dueDay: addDays(today, 1), status: 'learning', skipCandidate: false }, outcome: 'debtCleared', learnedDelta: 0 };
   }
 
   if (p.lastAdvanceDay === today) {

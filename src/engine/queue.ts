@@ -2,6 +2,7 @@ import type { WordProgress } from '@/types/progress';
 import { LEVELS, type Level } from '@/content/types';
 import type { DayString } from './clock';
 import { HALF_NEW_THRESHOLD, MAX_REVIEWS_PER_GAME, NO_NEW_THRESHOLD } from './rules';
+import { playStep, roundKindFor } from './scheduler';
 
 export interface QueuePlan {
   /** Ordered ids to play: debts, then reviews and new words interleaved. */
@@ -58,14 +59,31 @@ export function buildQueue(progress: Iterable<WordProgress>, today: DayString, n
   const newAllowed = allowedNew(dueTotal, newPerGame);
   const fresh = freshCandidates.slice(0, newAllowed);
 
+  const byId = new Map<string, WordProgress>();
+  for (const p of due) byId.set(p.wordId, p);
+  const kindOf = (id: string) => {
+    const p = byId.get(id);
+    return p ? roundKindFor(playStep(p)) : 'tap';
+  };
   return {
-    ids: [...debts.map((p) => p.wordId), ...interleave(reviews, fresh)],
+    ids: [...debts.map((p) => p.wordId), ...alternateKinds(interleave(reviews, fresh), kindOf)],
     debts: debts.map((p) => p.wordId),
     reviews,
     fresh,
     deferred,
     newAllowed,
   };
+}
+
+/**
+ * Reorders ids so tap and typing rounds alternate where possible (SPEC §6.6), keeping the
+ * relative order inside each kind. When one kind runs out the rest follow unchanged.
+ */
+export function alternateKinds(ids: string[], kindOf: (id: string) => 'tap' | 'type'): string[] {
+  const taps = ids.filter((id) => kindOf(id) === 'tap');
+  const types = ids.filter((id) => kindOf(id) === 'type');
+  if (taps.length === 0 || types.length === 0) return ids.slice();
+  return interleave(taps, types);
 }
 
 /** Spreads the shorter list evenly through the longer one, keeping both orders. */

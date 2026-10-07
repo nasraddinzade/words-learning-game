@@ -65,3 +65,21 @@ describe('levelOrder', () => {
     expect(levelOrder('A1')).toEqual(['A1', 'A2', 'B1', 'B2', 'C1']);
   });
 });
+
+import { alternateKinds } from './queue';
+
+describe('alternateKinds', () => {
+  it('alternates tap and type rounds, keeping order inside each kind', () => {
+    const kind = (id: string) => (id.startsWith('t') ? 'type' : 'tap') as 'tap' | 'type';
+    expect(alternateKinds(['a', 'b', 't1', 'c', 't2', 'd'], kind)).toEqual(['a', 't1', 'b', 'c', 't2', 'd']);
+    expect(alternateKinds(['a', 'b'], kind)).toEqual(['a', 'b']);
+    expect(alternateKinds(['t1', 't2'], kind)).toEqual(['t1', 't2']);
+  });
+
+  it('is applied to the queue after the debts', () => {
+    const progress = [learning('r1', D, { step: 3 }), learning('r2', D, { step: 1 }), learning('r3', D, { step: 4 })];
+    const q = buildQueue(progress, D, 2, ['n1', 'n2']);
+    const kinds = q.ids.map((id) => (progress.find((p) => p.wordId === id)?.step ?? 1) >= 3 ? 'type' : 'tap');
+    expect(kinds).toEqual(['tap', 'type', 'tap', 'type', 'tap']);
+  });
+});
