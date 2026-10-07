@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { appClock } from '@/app/clock';
 import { useProfile } from '@/app/profileStore';
 import { useDevStore } from './devStore';
+import { useGame } from '@/app/gameStore';
 
 /**
  * Dev-only panel (SPEC §13): move the day forward, reset progress, set the learned counter.
@@ -16,6 +17,8 @@ export function DevPanel() {
   const setLearnedCount = useProfile((s) => s.setLearnedCount);
   const resetEverything = useProfile((s) => s.resetEverything);
   const today = appClock.today();
+  const plan = useGame((s) => s.plan);
+  const gameSeed = useGame((s) => s.seed);
 
   const field = 'min-h-10 w-20 rounded-lg border border-border bg-bg px-2 text-text';
   const btn = 'min-h-10 rounded-lg border border-border bg-surface-2 px-3 text-sm font-semibold';
@@ -44,6 +47,14 @@ export function DevPanel() {
             <span data-testid="dev-today" className="text-text">
               {today} <span className="text-muted">(offset {dayOffset >= 0 ? '+' : ''}{dayOffset})</span>
             </span>
+            {plan && (
+              <>
+                <span>queue</span>
+                <span data-testid="dev-queue" className="text-text">
+                  debts {plan.debts.length} · reviews {plan.reviews.length} · new {plan.fresh.length} · deferred {plan.deferred} · seed {gameSeed}
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

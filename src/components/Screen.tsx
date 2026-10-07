@@ -16,7 +16,7 @@ export function Screen({ title, back, testId, children, bare }: Props) {
   return (
     <main
       data-testid={testId}
-      className={`flex flex-1 flex-col ${bare ? '' : 'px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]'}`}
+      className={`relative flex flex-1 flex-col ${bare ? '' : 'px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]'}`}
     >
       {(title || back) && (
         <header className="mb-3 flex min-h-12 items-center gap-2">

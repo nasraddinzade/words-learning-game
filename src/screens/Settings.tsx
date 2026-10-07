@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { useProfile } from '@/app/profileStore';
+import { listEnglishVoices, speechSupported } from '@/app/speech';
 import { Button } from '@/components/Button';
 import { LearningSettings } from '@/components/LearningSettings';
 import { Screen } from '@/components/Screen';
@@ -11,6 +13,14 @@ export function Settings() {
   const update = useProfile((s) => s.update);
   const updateSettings = useProfile((s) => s.updateSettings);
   const { settings } = profile;
+  const [voices, setVoices] = useState<string[]>([]);
+  useEffect(() => {
+    if (!speechSupported()) return;
+    const refresh = () => setVoices(listEnglishVoices().map((v) => v.name));
+    refresh();
+    window.speechSynthesis.addEventListener('voiceschanged', refresh);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', refresh);
+  }, []);
 
   return (
     <Screen testId="screen-settings" title="Settings" back>
@@ -41,8 +51,20 @@ export function Settings() {
           <Toggle label="Auto speak" testId="toggle-autospeak" checked={settings.autoSpeak} onChange={(v) => void updateSettings({ autoSpeak: v })} />
           <label className="flex min-h-12 items-center justify-between gap-4 py-1">
             <span>Voice</span>
-            <select aria-label="Voice" className="min-h-12 max-w-[55%] rounded-xl border border-border bg-surface px-3" value="" disabled>
-              <option value="">System default (stage 1)</option>
+            <select
+              aria-label="Voice"
+              data-testid="voice"
+              className="min-h-12 max-w-[55%] rounded-xl border border-border bg-surface px-3"
+              value={settings.voice ?? ''}
+              onChange={(e) => void updateSettings({ voice: e.target.value || null })}
+              disabled={!speechSupported()}
+            >
+              <option value="">{speechSupported() ? 'System default' : 'No speech on this device'}</option>
+              {voices.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
             </select>
           </label>
         </section>
