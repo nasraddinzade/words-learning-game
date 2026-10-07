@@ -4,8 +4,9 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// GitHub Pages serves the app from /words-learning-game/ (SPEC §14).
-export const BASE = '/words-learning-game/';
+// GitHub Pages serves the app from /words-learning-game/ (SPEC §14). Vercel and other
+// root-hosted deploys set BASE_PATH=/ (Vercel is detected by its VERCEL env var).
+export const BASE = process.env.BASE_PATH ?? (process.env.VERCEL ? '/' : '/words-learning-game/');
 
 export default defineConfig({
   base: BASE,

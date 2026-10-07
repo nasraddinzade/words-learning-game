@@ -31,7 +31,7 @@ npm run icons          # regenerate PWA PNG icons from public/icons/icon.svg
 - Dev-only tools (`?seed=`, `?speed=`, dev panel) are gated by `isDevToolsEnabled()` in `src/dev/enabled.ts`. They exist in `vite dev` and in `build:e2e`, never in the production build.
 - Progress is written to IndexedDB after every answer. Never block play because of mistakes or missed days.
 - Animations use transform/opacity only; respect `prefers-reduced-motion`. Touch targets ≥ 48px.
-- Vite `base` is `/words-learning-game/`; keep service worker and manifest paths relative to it.
+- Vite `base` is `/words-learning-game/` for GitHub Pages and `/` on Vercel (auto) or when `BASE_PATH=/` is set. Never hardcode the base in HTML or code; use `%BASE_URL%` / `import.meta.env.BASE_URL`.
 
 ## Self-check rule (SPEC §13, mandatory)
 
