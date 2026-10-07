@@ -1,6 +1,6 @@
 # Stage 1 verification: core, the fun prototype
 
-Date: 2026-10-07. Branch `claude/dreamy-rubin-31q8dd`. Commit hashes and push confirmation at the end.
+Date: 2026-10-07. Branch `claude/dreamy-rubin-31q8dd`. Code commits `38362f6`..`5f1102d`, report commit after them; pushed, confirmed with `git ls-remote`. Tag `stage-1` is local only (the session's git proxy refuses tag pushes).
 
 ## What was built
 
