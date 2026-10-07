@@ -23,12 +23,16 @@ interface GameStore {
   roundStartedAt: number;
   pausedAt: number | null;
   lastResult: AnswerResult | null;
-  /** Mistakes the player made this game, for the summary list. */
+  /** Letters typed so far in a typing round. */
+  typed: string;
   quitEarly: boolean;
   error: string | null;
 
   start(): Promise<void>;
   tap(optionId: string, now: number): void;
+  /** Typing rounds: update the letters; submits automatically when the word length is reached. */
+  setTyped(text: string, now: number): void;
+  submitTyped(now: number): void;
   miss(now: number): void;
   continueRound(now: number): void;
   pause(now: number): void;
@@ -47,6 +51,7 @@ export const useGame = create<GameStore>((set, get) => ({
   roundStartedAt: 0,
   pausedAt: null,
   lastResult: null,
+  typed: '',
   quitEarly: false,
   error: null,
 
@@ -64,14 +69,35 @@ export const useGame = create<GameStore>((set, get) => ({
       const seed = dev.params.seed ?? String(randomSeed());
       const ctx: SessionContext = { entries, pool, rng: createRng(seed), speed: dev.params.speed };
       const session = startRound(createSession(plan.ids, progress), ctx);
-      set({ session, ctx, seed, plan, phase: session.finished ? 'finished' : 'playing', roundStartedAt: performance.now(), pausedAt: null });
+      set({ session, ctx, seed, plan, phase: session.finished ? 'finished' : 'playing', roundStartedAt: performance.now(), pausedAt: null, typed: '' });
     } catch (e) {
       set({ phase: 'idle', error: e instanceof Error ? e.message : String(e) });
     }
   },
 
-  tap: (optionId, now) => resolve(get, set, optionId, now),
-  miss: (now) => resolve(get, set, null, now),
+  tap: (optionId, now) => {
+    if (get().session?.round?.kind !== 'tap') return;
+    resolve(get, set, { choiceId: optionId }, now);
+  },
+  setTyped: (text, now) => {
+    const { session, phase, ctx } = get();
+    const round = session?.round;
+    if (!round || round.kind !== 'type' || phase !== 'playing') return;
+    const clean = text.replace(/[^a-z'-]/gi, '').toLowerCase();
+    const word = ctx?.entries.get(round.wordId)?.word ?? '';
+    set({ typed: clean });
+    if (word && clean.length >= word.length) resolve(get, set, { typed: clean }, now);
+  },
+  submitTyped: (now) => {
+    const { session, typed } = get();
+    if (session?.round?.kind !== 'type' || typed.length === 0) return;
+    resolve(get, set, { typed }, now);
+  },
+  miss: (now) => {
+    const kind = get().session?.round?.kind;
+    if (!kind) return;
+    resolve(get, set, kind === 'tap' ? { choiceId: null } : { typed: null }, now);
+  },
 
   continueRound: (now) => {
     const { session, ctx, phase } = get();
@@ -81,7 +107,7 @@ export const useGame = create<GameStore>((set, get) => ({
       return;
     }
     const next = startRound(session, ctx);
-    set({ session: next, phase: next.finished ? 'finished' : 'playing', roundStartedAt: now, lastResult: null });
+    set({ session: next, phase: next.finished ? 'finished' : 'playing', roundStartedAt: now, lastResult: null, typed: '' });
   },
 
   pause: (now) => {
@@ -114,13 +140,14 @@ export const useGame = create<GameStore>((set, get) => ({
   },
 }));
 
-function resolve(get: () => GameStore, set: (s: Partial<GameStore>) => void, choiceId: string | null, now: number): void {
+function resolve(get: () => GameStore, set: (s: Partial<GameStore>) => void, input: { choiceId?: string | null; typed?: string | null }, now: number): void {
   const { session, ctx, phase, roundStartedAt } = get();
   if (!session || !ctx || phase !== 'playing' || !session.round) return;
   const round = session.round;
   const word = round.fall.find((f) => f.id === round.wordId);
-  const fraction = word ? elapsedFraction(word, now - roundStartedAt, round.fallMs) : 1;
-  const { state, result } = answer(session, { choiceId, elapsedFraction: choiceId ? fraction : 1, today: appClock.today(), rng: ctx.rng });
+  const answered = input.choiceId != null || input.typed != null;
+  const fraction = word && answered ? elapsedFraction(word, now - roundStartedAt, round.fallMs) : 1;
+  const { state, result } = answer(session, ctx, { ...input, elapsedFraction: fraction, today: appClock.today(), rng: ctx.rng });
   set({ session: state, lastResult: result, phase: 'card' });
 
   // Persist after every answer (SPEC §5.6). Failures are logged, never block play.
