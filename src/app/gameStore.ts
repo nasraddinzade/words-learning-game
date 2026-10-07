@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { WordEntry } from '@/content/types';
-import { loadEntriesFor, pickFreshCandidates } from '@/content/loader';
+import { filesFor, loadEntriesFor, pickFreshCandidates, prefetchNextBatches } from '@/content/loader';
 import { db } from '@/db/db';
 import { useProfile, type GameRecords } from './profileStore';
 import { playCorrect, playLearned, playWrong } from './sound';
@@ -74,6 +74,7 @@ export const useGame = create<GameStore>((set, get) => ({
       const candidates = await pickFreshCandidates(levelOrder(profile.settings.startLevel), seen, profile.settings.newPerGame);
       const plan = buildQueue(progress, today, profile.settings.newPerGame, candidates);
       const { entries, pool } = await loadEntriesFor(plan.ids);
+      prefetchNextBatches(await filesFor(plan.ids));
       const seed = dev.params.seed ?? String(randomSeed());
       const ctx: SessionContext = { entries, pool, rng: createRng(seed), speed: dev.params.speed };
       const session = startRound(createSession(plan.ids, progress), ctx);

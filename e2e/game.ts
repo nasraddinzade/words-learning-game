@@ -25,7 +25,8 @@ export async function readRound(page: Page): Promise<RoundView> {
   const chips = page.getByTestId('falling-word');
   await expect(chips.first()).toBeAttached();
   const correctId = await page.locator('[data-testid="falling-word"][data-correct="true"]').getAttribute('data-word-id');
-  const options = await chips.evaluateAll((els) => els.map((el) => ({ id: el.getAttribute('data-word-id') ?? '', word: el.textContent?.trim() ?? '' })));
+  // The first span is the word; the second is the desktop key badge.
+  const options = await chips.evaluateAll((els) => els.map((el) => ({ id: el.getAttribute('data-word-id') ?? '', word: el.querySelector('span')?.textContent?.trim() ?? '' })));
   if (!correctId) throw new Error('no data-correct chip: dev tools missing?');
   return { correctId, options };
 }

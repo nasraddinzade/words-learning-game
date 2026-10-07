@@ -73,6 +73,7 @@ export function Game() {
     if (isTyping) inputRef.current?.focus();
   }, [isTyping, round?.index]);
 
+
   const onTap = useCallback(
     (id: string, el: HTMLElement) => {
       if (useGame.getState().phase !== 'playing') return;
@@ -82,6 +83,29 @@ export function Game() {
     },
     [tap],
   );
+  // Desktop keys (SPEC §12): 1-6 tap the chip with that number, Escape pauses or resumes.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const g = useGame.getState();
+      if (e.key === 'Escape') {
+        if (g.phase === 'playing') g.pause(performance.now());
+        else if (g.phase === 'paused') g.resume(performance.now());
+        return;
+      }
+      const r = g.session?.round;
+      if (g.phase !== 'playing' || !r || r.kind !== 'tap') return;
+      const n = Number(e.key);
+      if (!Number.isInteger(n) || n < 1 || n > r.fall.length) return;
+      const id = r.fall[n - 1]?.id;
+      const el = id ? document.querySelector<HTMLElement>(`[data-testid="falling-word"][data-word-id="${id}"]`) : null;
+      if (!id || !el || el.style.opacity !== '1') return;
+      e.preventDefault();
+      onTap(id, el);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onTap]);
+
   const onMiss = useCallback(() => miss(performance.now()), [miss]);
   const elapsed = useCallback(() => {
     const { phase: ph, roundStartedAt } = useGame.getState();

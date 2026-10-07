@@ -36,6 +36,34 @@ export async function loadEntriesFor(ids: Iterable<string>): Promise<{ entries: 
   return { entries: new Map(pool.map((e) => [e.id, e])), pool };
 }
 
+/**
+ * Warms the cache for the batches that follow the ones in use, when the browser is idle
+ * (SPEC §9.1). The service worker precaches every batch at install anyway; this only saves the
+ * first parse on the next game.
+ */
+export function prefetchNextBatches(usedFiles: Iterable<string>, count = 1): void {
+  if (typeof window === 'undefined') return;
+  const used = new Set(usedFiles);
+  const ordered = MANIFEST.map((b) => b.file);
+  const lastUsed = Math.max(-1, ...ordered.map((f, i) => (used.has(f) ? i : -1)));
+  const next = ordered.slice(lastUsed + 1, lastUsed + 1 + count).filter((f) => !used.has(f));
+  if (next.length === 0) return;
+  const run = () => next.forEach((f) => void loadBatch(f).catch(() => undefined));
+  if ('requestIdleCallback' in window) window.requestIdleCallback(run, { timeout: 5000 });
+  else setTimeout(run, 1000);
+}
+
+/** Batch files that hold any of `ids` (after loadWordIndex). */
+export async function filesFor(ids: Iterable<string>): Promise<Set<string>> {
+  const index = await loadWordIndex();
+  const files = new Set<string>();
+  for (const id of ids) {
+    const f = index[id];
+    if (f) files.add(f);
+  }
+  return files;
+}
+
 /** Unseen words of the given levels by rank (Speed check pool, SPEC §7). */
 export async function pickUnseenOfLevels(levels: readonly Level[], seen: ReadonlySet<string>, limit: number): Promise<string[]> {
   return pickFreshCandidates(levels, seen, limit);

@@ -7,6 +7,9 @@ import { Screen } from '@/components/Screen';
 import { Toggle } from '@/components/Toggle';
 import { THEMES } from '@/app/themes';
 import { formatCount } from '@/app/format';
+import { applyImport, buildExportJson, downloadText, previewImport, type ImportPreview } from '@/app/transfer';
+import { db } from '@/db/db';
+import { useRef } from 'react';
 
 export function Settings() {
   const profile = useProfile((s) => s.profile);
@@ -14,6 +17,47 @@ export function Settings() {
   const updateSettings = useProfile((s) => s.updateSettings);
   const { settings } = profile;
   const [voices, setVoices] = useState<string[]>([]);
+  const [flaggedCount, setFlaggedCount] = useState<number | null>(null);
+  const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    let alive = true;
+    db.progress
+      .filter((p) => p.flagged)
+      .count()
+      .then((n) => alive && setFlaggedCount(n))
+      .catch(() => alive && setFlaggedCount(0));
+    return () => {
+      alive = false;
+    };
+  }, [profile.learnedCount]);
+
+  const onExport = async () => {
+    const { json, fileName } = await buildExportJson();
+    downloadText(json, fileName);
+    setNotice(`Saved ${fileName}`);
+  };
+  const onPickFile = async (file: File | undefined) => {
+    if (!file) return;
+    setNotice(null);
+    setPreview(await previewImport(await file.text()));
+    if (fileRef.current) fileRef.current.value = '';
+  };
+  const onConfirmImport = async () => {
+    if (!preview?.ok) return;
+    setImporting(true);
+    try {
+      await applyImport(preview.file);
+      setNotice(`Imported: ${formatCount(preview.learnedInFile)} learned words, ${formatCount(preview.wordsInFile)} words with progress.`);
+      setPreview(null);
+    } catch (e) {
+      setPreview({ ok: false, error: `Import failed, nothing was changed: ${e instanceof Error ? e.message : String(e)}` });
+    } finally {
+      setImporting(false);
+    }
+  };
   useEffect(() => {
     if (!speechSupported()) return;
     const refresh = () => setVoices(listEnglishVoices().map((v) => v.name));
@@ -91,10 +135,44 @@ export function Settings() {
         <section className="grid gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Progress</h2>
           <div className="grid grid-cols-2 gap-3">
-            <Button disabled>Export progress</Button>
-            <Button disabled>Import progress</Button>
+            <Button data-testid="export" onClick={() => void onExport()}>Export progress</Button>
+            <Button data-testid="import" onClick={() => fileRef.current?.click()}>Import progress</Button>
+            <input ref={fileRef} data-testid="import-file" type="file" accept="application/json,.json" className="hidden" onChange={(e) => void onPickFile(e.target.files?.[0])} />
           </div>
-          <p className="text-sm text-muted">Transfer between devices arrives in stage 4.</p>
+          <p className="text-sm text-muted">
+            One JSON file with all progress, settings and {flaggedCount === null ? '…' : flaggedCount} flagged {flaggedCount === 1 ? 'card' : 'cards'}. Import replaces everything on this device.
+          </p>
+          {notice && (
+            <p className="rounded-xl border border-ok/40 bg-ok/10 px-3 py-2 text-sm" data-testid="transfer-notice">{notice}</p>
+          )}
+          {preview && !preview.ok && (
+            <p className="rounded-xl border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" data-testid="import-error">
+              Cannot import this file. {preview.error}
+            </p>
+          )}
+          {preview?.ok && (
+            <div className="grid gap-3 rounded-2xl border border-warn/50 bg-surface p-4" data-testid="import-confirm">
+              <p className="font-semibold">Replace the progress on this device?</p>
+              <dl className="grid grid-cols-2 gap-y-1 text-sm">
+                <dt className="text-muted">In the file</dt>
+                <dd className="tabular-nums" data-testid="import-file-learned">{formatCount(preview.learnedInFile)} learned, {formatCount(preview.wordsInFile)} words</dd>
+                <dt className="text-muted">On this device</dt>
+                <dd className="tabular-nums" data-testid="import-device-learned">{formatCount(preview.learnedOnDevice)} learned</dd>
+                {preview.file.exportedAt && (
+                  <>
+                    <dt className="text-muted">Exported</dt>
+                    <dd>{preview.file.exportedAt.slice(0, 10)}</dd>
+                  </>
+                )}
+              </dl>
+              <div className="grid grid-cols-2 gap-3">
+                <Button data-testid="import-cancel" onClick={() => setPreview(null)} disabled={importing}>Cancel</Button>
+                <Button variant="danger" data-testid="import-confirm-button" onClick={() => void onConfirmImport()} disabled={importing}>
+                  Replace
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </Screen>

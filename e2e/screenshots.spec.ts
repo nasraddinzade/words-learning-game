@@ -8,7 +8,7 @@ import { THEMES } from '../src/app/themes';
  * Captures every screen and game state for the verification report (SPEC §13 step 3).
  * Files land in docs/verification/screenshots/<stage>/<project>-<name>.png.
  */
-const STAGE = process.env.STAGE ?? 'stage-3';
+const STAGE = process.env.STAGE ?? 'stage-4';
 const DIR = `docs/verification/screenshots/${STAGE}`;
 
 test('capture all screens', async ({ page }, testInfo) => {
@@ -112,5 +112,13 @@ test('capture all screens', async ({ page }, testInfo) => {
     }
     await page.goto(`${APP_PATH}#/settings`);
     await shot('settings-themes');
+    await page.getByTestId('import-file').setInputFiles({ name: 'broken.json', mimeType: 'application/json', buffer: Buffer.from('{ not json') });
+    await page.getByTestId('import-error').scrollIntoViewIfNeeded();
+    await shot('import-error');
+    const exportJson = JSON.stringify({ app: 'words-learning-game', version: 1, exportedAt: '2026-10-01T10:00:00.000Z', profile: { learnedCount: 7, streak: 2, freezes: 0, lastPlayedDay: null, settings: {} }, progress: [], flagged: [] });
+    await page.getByTestId('import-file').setInputFiles({ name: 'ok.json', mimeType: 'application/json', buffer: Buffer.from(exportJson) });
+    await page.getByTestId('import-confirm').scrollIntoViewIfNeeded();
+    await shot('import-confirm');
+    await page.getByTestId('import-cancel').click();
   }
 });
