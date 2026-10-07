@@ -1,13 +1,13 @@
 import { mkdirSync } from 'node:fs';
 import { test } from '@playwright/test';
 import { APP_PATH, openFresh } from './helpers';
+import { continueCard, readRound, startGame, tapCorrect, tapWrong } from './game';
 
 /**
- * Captures every screen for the verification report (SPEC §13 step 3). Screenshots land in
- * docs/verification/screenshots/<stage>/<project>-<screen>.png and are looked at by a human (or
- * Claude) before a stage is called done.
+ * Captures every screen and game state for the verification report (SPEC §13 step 3).
+ * Files land in docs/verification/screenshots/<stage>/<project>-<name>.png.
  */
-const STAGE = process.env.STAGE ?? 'stage-0';
+const STAGE = process.env.STAGE ?? 'stage-1';
 const DIR = `docs/verification/screenshots/${STAGE}`;
 
 test('capture all screens', async ({ page }, testInfo) => {
@@ -18,14 +18,29 @@ test('capture all screens', async ({ page }, testInfo) => {
   await shot('home');
   await page.goto(`${APP_PATH}#/setup`);
   await shot('setup');
-  await page.goto(`${APP_PATH}#/game`);
-  await shot('game');
-  await page.goto(`${APP_PATH}#/card`);
-  await shot('card');
+
+  await startGame(page, { seed: 'shots', speed: 1, newPerGame: 10, fresh: false });
+  const chip = page.locator('[data-testid="falling-word"]').last();
+  await chip.waitFor();
+  await page.waitForTimeout(4000);
+  await shot('game-falling');
+  await tapCorrect(page);
+  await shot('card-correct');
   await page.getByTestId('show-translation').click();
   await shot('card-translation');
-  await page.goto(`${APP_PATH}#/summary`);
+  await continueCard(page);
+  await readRound(page);
+  await page.waitForTimeout(1500);
+  await tapWrong(page);
+  await shot('card-wrong');
+  await continueCard(page);
+  await readRound(page);
+  await page.waitForTimeout(1500);
+  await page.getByTestId('pause').click();
+  await shot('pause');
+  await page.getByTestId('quit').click();
   await shot('summary');
+
   await page.goto(`${APP_PATH}#/`);
   await page.getByTestId('dev-toggle').click();
   await page.getByTestId('dev-learned-n').fill('1234');

@@ -22,6 +22,9 @@ test.describe('offline', () => {
     await expect(page.getByTestId('screen-setup')).toBeVisible();
     await page.getByTestId('start-game').click();
     await expect(page.getByTestId('screen-game')).toBeVisible();
+    // The word batch must come from the cache too.
+    await expect(page.getByTestId('falling-word').first()).toBeAttached();
+    await expect(page.getByTestId('definition')).not.toHaveText('…');
 
     // A cold navigation to a deep link must also come from the cache.
     await page.goto(`${APP_PATH}#/settings`);
