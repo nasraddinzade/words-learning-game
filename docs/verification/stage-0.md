@@ -49,7 +49,7 @@ Console: no errors or warnings in the smoke and offline flows (asserted in tests
 - `LEVEL_COUNTS` is all zeros until the 300-word B2 starter set lands (stage 1).
 - `validate-words` covers schema, ids, duplicates, braces, Cyrillic; master-list rank, definition simplicity, `avoid` existence and distractor supply come with the base (stage 1).
 - GitHub Pages workflow is stage 4; the Vite base and SW paths are already set for it.
-- The spec asks for pushes to `main`; this session is bound to `claude/dreamy-rubin-31q8dd`, so the push and the `stage-0` tag went there. Merging into `main` is the user's call.
+- The spec asks for pushes to `main`; this session is bound to `claude/dreamy-rubin-31q8dd`, so the code was pushed there (confirmed with `git ls-remote`, head `5f95e8c`). The `stage-0` tag exists locally but the session's git proxy refuses tag pushes (HTTP 403). Merging into `main` and pushing the tag are the user's call: `git tag -a stage-0 5f95e8c -m 'Stage 0: skeleton' && git push origin stage-0`.
 
 ## Checklist for the user on a real phone
 
