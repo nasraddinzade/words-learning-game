@@ -5,13 +5,15 @@ import { speak, stopSpeaking } from '@/app/speech';
 import { plainSentence as toPlain, splitSentence } from '@/app/sentence';
 import { Button } from './Button';
 
-export type CardVerdict = 'correct' | 'wrong' | 'missed' | 'review';
+export type CardVerdict = 'correct' | 'learned' | 'wrong' | 'typo' | 'missed' | 'skipFailed' | 'review';
 
 interface Props {
   entry: WordEntry;
   verdict: CardVerdict;
   /** What the player tapped instead (wrong taps only). */
   chosen?: WordEntry | null;
+  /** What the player typed (typing rounds). */
+  typed?: string | null;
   flagged: boolean;
   onToggleFlag(): void;
   onContinue(): void;
@@ -20,8 +22,11 @@ interface Props {
 
 const HEADLINE: Record<CardVerdict, { text: string; cls: string }> = {
   correct: { text: 'Correct!', cls: 'text-ok' },
+  learned: { text: 'Learned!', cls: 'text-accent' },
   wrong: { text: 'Not this one. The word was', cls: 'text-danger' },
+  typo: { text: 'Not quite. The word is', cls: 'text-danger' },
   missed: { text: 'Too slow. The word was', cls: 'text-danger' },
+  skipFailed: { text: 'No life lost. Back to the normal path', cls: 'text-warn' },
   review: { text: 'Word card', cls: 'text-muted' },
 };
 
@@ -29,7 +34,7 @@ const HEADLINE: Record<CardVerdict, { text: string; cls: string }> = {
  * The pause card after an answer (SPEC §5.3, §5.4). Russian appears only in the translation.
  * Mount it with `key={entry.id}` so the translation is hidden again for every new word.
  */
-export function WordCard({ entry, verdict, chosen, flagged, onToggleFlag, onContinue, continueLabel = 'Continue' }: Props) {
+export function WordCard({ entry, verdict, chosen, typed, flagged, onToggleFlag, onContinue, continueLabel = 'Continue' }: Props) {
   const [showTranslation, setShowTranslation] = useState(false);
   const settings = useProfile((s) => s.profile.settings);
   const { before, hit, after } = splitSentence(entry.sentence);
@@ -41,7 +46,11 @@ export function WordCard({ entry, verdict, chosen, flagged, onToggleFlag, onCont
   }, [entry.id, entry.word, plainSentence, settings.autoSpeak, settings.voice, verdict]);
 
   useEffect(() => {
+    // The Enter that submitted a typed answer is still propagating when the card mounts
+    // (React flushes the mount synchronously), so ignore keys from the first moments.
+    const armedAt = performance.now() + 250;
     const onKey = (e: KeyboardEvent) => {
+      if (e.timeStamp < armedAt) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         onContinue();
@@ -63,6 +72,11 @@ export function WordCard({ entry, verdict, chosen, flagged, onToggleFlag, onCont
         {verdict === 'wrong' && chosen && (
           <p className="mt-2 text-sm text-muted" data-testid="card-chosen">
             You tapped <span className="font-semibold text-danger line-through">{chosen.word}</span>
+          </p>
+        )}
+        {(verdict === 'typo' || verdict === 'skipFailed') && typed && (
+          <p className="mt-2 text-sm text-muted" data-testid="card-typed">
+            You typed <span className="font-semibold text-danger line-through">{typed}</span>
           </p>
         )}
       </header>

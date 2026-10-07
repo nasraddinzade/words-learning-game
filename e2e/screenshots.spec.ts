@@ -1,13 +1,13 @@
 import { mkdirSync } from 'node:fs';
 import { test } from '@playwright/test';
 import { APP_PATH, openFresh } from './helpers';
-import { continueCard, readRound, startGame, tapCorrect, tapWrong } from './game';
+import { continueCard, learningRow, localDay, readRound, startGame, tapCorrect, tapWrong, untilTyping, writeProgress } from './game';
 
 /**
  * Captures every screen and game state for the verification report (SPEC §13 step 3).
  * Files land in docs/verification/screenshots/<stage>/<project>-<name>.png.
  */
-const STAGE = process.env.STAGE ?? 'stage-1';
+const STAGE = process.env.STAGE ?? 'stage-2';
 const DIR = `docs/verification/screenshots/${STAGE}`;
 
 test('capture all screens', async ({ page }, testInfo) => {
@@ -41,6 +41,38 @@ test('capture all screens', async ({ page }, testInfo) => {
   await page.getByTestId('quit').click();
   await shot('summary');
 
+  // Typing rounds: step 3 with the first letter, then a typo card.
+  await writeProgress(page, [learningRow('deteriorate-v', 3, localDay(0))]);
+  await page.goto(`${APP_PATH}#/`);
+  await startGame(page, { seed: 'shots-type', speed: 0.5, newPerGame: 5, fresh: false });
+  await untilTyping(page);
+  await page.waitForTimeout(2500);
+  await shot('typing-step3');
+  await page.getByTestId('typing-input').fill('deter');
+  await shot('typing-partial');
+  await page.getByTestId('typing-input').fill('deteriorxte');
+  await shot('card-typo');
+  await continueCard(page);
+  await page.getByTestId('pause').click();
+  await page.getByTestId('quit').click();
+
+  // Speed check with the start level raised to C1.
+  await page.goto(`${APP_PATH}#/settings`);
+  await page.getByRole('radio', { name: /^C1/ }).click();
+  await page.goto(`${APP_PATH}#/`);
+  await page.getByTestId('nav-speed').click();
+  await page.getByTestId('typing-word').waitFor();
+  await page.waitForTimeout(1500);
+  await shot('speed-round');
+  const id = (await page.getByTestId('typing-word').getAttribute('data-word-id'))!;
+  const words = (await import('./words')).loadWords();
+  await page.getByTestId('typing-input').fill(words.find((w) => w.id === id)!.word);
+  await shot('speed-feedback');
+  await page.goto(`${APP_PATH}#/settings`);
+  await page.getByRole('radio', { name: /^B2/ }).click();
+  await page.goto(`${APP_PATH}#/speed`);
+  await shot('speed-empty');
+
   await page.goto(`${APP_PATH}#/`);
   await page.getByTestId('dev-toggle').click();
   await page.getByTestId('dev-learned-n').fill('1234');
@@ -48,8 +80,6 @@ test('capture all screens', async ({ page }, testInfo) => {
   await shot('dev-panel');
   await page.goto(`${APP_PATH}#/map`);
   await shot('map');
-  await page.goto(`${APP_PATH}#/speed`);
-  await shot('speed');
   await page.goto(`${APP_PATH}#/settings`);
   await shot('settings');
 });

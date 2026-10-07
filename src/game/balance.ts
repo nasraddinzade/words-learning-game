@@ -28,6 +28,10 @@ export const BALANCE = {
   stepUpEvery: 3,
   /** Typing rounds get this much more time than tap rounds (SPEC §5.2). */
   typeFallFactor: 1.6,
+  /** Speed check (SPEC §7): fast typing rounds, one fixed fall time. */
+  speedCheckFallMs: 7_000,
+  /** Words per Speed check session. */
+  speedCheckBatch: 20,
   /** All words of a round spawn within this share of the fall time. */
   spawnSpread: 0.3,
   /** Points. */

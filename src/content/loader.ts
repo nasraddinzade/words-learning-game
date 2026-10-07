@@ -36,6 +36,11 @@ export async function loadEntriesFor(ids: Iterable<string>): Promise<{ entries: 
   return { entries: new Map(pool.map((e) => [e.id, e])), pool };
 }
 
+/** Unseen words of the given levels by rank (Speed check pool, SPEC §7). */
+export async function pickUnseenOfLevels(levels: readonly Level[], seen: ReadonlySet<string>, limit: number): Promise<string[]> {
+  return pickFreshCandidates(levels, seen, limit);
+}
+
 /**
  * New words for a game: the start level by rank, then the levels in `order` (SPEC §3).
  * Only loads batches that contain words of the level being searched.

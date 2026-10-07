@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { loadWords } from './words';
 import { APP_PATH } from './helpers';
-import { continueCard, localDay, readProgress, readRound, shiftDay, startGame, tapCorrect, tapWrong, writeProgress, type ProgressRow } from './game';
+import { answerRound, continueCard, isTypingRound, localDay, readProgress, readRound, shiftDay, startGame, tapCorrect, tapWrong, writeProgress, type ProgressRow } from './game';
 
 const words = loadWords();
+const byId = new Map(words.map((w) => [w.id, w]));
 
 test.describe('learning logic across days', () => {
   test('steps 1-3 on different days, one step per day, rollback on a mistake', async ({ page }) => {
@@ -49,20 +50,20 @@ test.describe('learning logic across days', () => {
       expect(progress[id]?.dueDay, id).toBe(localDay(3));
     }
 
-    // Day 3: a mistake on a step-3 word drops it to step 2 and it returns in debt; the debt
-    // clears without a second step up on the same day.
+    // Day 3: the step-3 words come back as typing rounds. A typo drops one to step 2 and it
+    // returns in debt (as a tap round now); the debt clears without a second step up that day.
     await shiftDay(page, 2);
     await startGame(page, { seed: 'days-4', newPerGame: 5, fresh: false });
     let wrongId: string | null = null;
     for (let guard = 0; guard < 12 && !wrongId; guard++) {
-      const round = await readRound(page);
-      if (day0.includes(round.correctId)) {
-        wrongId = (await tapWrong(page)).correctId;
+      if (await isTypingRound(page)) {
+        wrongId = await answerRound(page, false, byId);
       } else {
         await tapCorrect(page);
       }
       await continueCard(page);
     }
+    expect(day0).toContain(wrongId);
     expect(wrongId).not.toBeNull();
     progress = await readProgress(page);
     expect(progress[wrongId!]?.step).toBe(2);
@@ -70,16 +71,17 @@ test.describe('learning logic across days', () => {
     expect(progress[wrongId!]?.lapses).toBe(1);
 
     for (let guard = 0; guard < 8; guard++) {
-      const round = await readRound(page);
-      await tapCorrect(page);
+      const id = await answerRound(page, true, byId);
       await continueCard(page);
-      if (round.correctId === wrongId) break;
+      if (id === wrongId) break;
     }
     progress = await readProgress(page);
     expect(progress[wrongId!]?.inDebt).toBe(false);
     expect(progress[wrongId!]?.step).toBe(2);
     expect(progress[wrongId!]?.dueDay).toBe(localDay(4));
-    expect(progress[wrongId!]?.confusedWith).toHaveLength(1);
+    // The mistake was a typo in a typing round: no confusion entry (those come from wrong taps).
+    expect(progress[wrongId!]?.confusedWith).toHaveLength(0);
+    expect(progress[wrongId!]?.lapses).toBe(1);
   });
 
   test('the regulator cuts new words when many reviews are due', async ({ page }) => {

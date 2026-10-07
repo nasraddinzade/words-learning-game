@@ -16,7 +16,7 @@ export default defineConfig({
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
-  timeout: 60_000,
+  timeout: 150_000,
   expect: { timeout: 10_000 },
   outputDir: 'test-results',
   use: {
