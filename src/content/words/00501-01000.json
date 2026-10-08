@@ -1,4 +1,4 @@
 [
-{"id": "reading-n", "word": "reading", "pos": "noun", "rank": 706, "level": "A1", "topic": "education", "definition": "the activity of looking at and understanding written words, or a measurement shown", "sentence": "Her {reading} improved quickly once she found books she loved.", "translation": "Её чтение быстро улучшилось, как только она нашла книги, которые полюбила.", "avoid": ["literacy", "study", "measurement"]},
+{"id": "reading-n", "word": "reading", "pos": "noun", "rank": 705, "level": "A1", "topic": "education", "definition": "the activity of looking at and understanding written words, or a measurement shown", "sentence": "Her {reading} improved quickly once she found books she loved.", "translation": "Её чтение быстро улучшилось, как только она нашла книги, которые полюбила.", "avoid": ["literacy", "study", "measurement"]},
 {"id": "reveal-v", "word": "reveal", "pos": "verb", "rank": 999, "level": "A1", "topic": "communication", "definition": "to make something known that was secret or hidden", "sentence": "She finally {revealed} where she had hidden the gifts.", "translation": "Она наконец раскрыла, где спрятала подарки.", "avoid": ["disclose"]}
 ]
