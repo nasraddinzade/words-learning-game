@@ -12,7 +12,7 @@ Counts are entries written / entries in the master list for that level.
 
 | Level | Rank band | Written | Notes |
 |---|---|---|---|
-| B2 | 4001–6500 | 358 / 2500 | starter words + batch 1 (4001–4267). Next: `python3 scripts/words/next_batch.py B2` → from rank 4268 |
+| B2 | 4001–6500 | 608 / 2500 | starter words + batches 1–2 (4001–4539). Next: `python3 scripts/words/next_batch.py B2` → from rank 4540 |
 | C1 | 6501–10000 | 23 / 3500 | starter words only |
 | B1 | 2001–4000 | 150 / 2000 | starter words only |
 | A2 | 1001–2000 | 32 / 1000 | starter words only |
