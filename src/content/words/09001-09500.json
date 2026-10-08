@@ -1,4 +1,4 @@
 [
-{"id": "gloomy-adj", "word": "gloomy", "pos": "adj", "rank": 9381, "level": "C1", "topic": "feelings", "definition": "dark and sad, without hope", "sentence": "The flat looks {gloomy} on rainy days.", "translation": "В дождливые дни квартира выглядит мрачно.", "avoid": []},
-{"id": "foresee-v", "word": "foresee", "pos": "verb", "rank": 9442, "level": "C1", "topic": "thinking", "definition": "to know that something will happen before it does", "sentence": "Nobody could {foresee} the traffic jam on a Sunday.", "translation": "Никто не мог предвидеть пробку в воскресенье.", "avoid": ["anticipate"]}
+{"id": "gloomy-adj", "word": "gloomy", "pos": "adj", "rank": 9371, "level": "C1", "topic": "feelings", "definition": "dark and sad, without hope", "sentence": "The flat looks {gloomy} on rainy days.", "translation": "В дождливые дни квартира выглядит мрачно.", "avoid": []},
+{"id": "foresee-v", "word": "foresee", "pos": "verb", "rank": 9432, "level": "C1", "topic": "thinking", "definition": "to know that something will happen before it does", "sentence": "Nobody could {foresee} the traffic jam on a Sunday.", "translation": "Никто не мог предвидеть пробку в воскресенье.", "avoid": ["anticipate"]}
 ]
