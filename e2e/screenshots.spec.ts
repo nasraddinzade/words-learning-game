@@ -70,9 +70,11 @@ test('capture all screens', async ({ page }, testInfo) => {
   await page.getByTestId('typing-input').fill(words.find((w) => w.id === id)!.word);
   await shot('speed-feedback');
   await page.goto(`${APP_PATH}#/settings`);
-  await page.getByRole('radio', { name: /^B2/ }).click();
+  await page.getByRole('radio', { name: /^A1/ }).click();
   await page.goto(`${APP_PATH}#/speed`);
   await shot('speed-empty');
+  await page.goto(`${APP_PATH}#/settings`);
+  await page.getByRole('radio', { name: /^B2/ }).click();
 
   await page.goto(`${APP_PATH}#/`);
   await page.getByTestId('dev-toggle').click();
