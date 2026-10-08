@@ -1,4 +1,4 @@
 [
-{"id": "scarcely-adv", "word": "scarcely", "pos": "adv", "rank": 9929, "level": "C1", "topic": "quantity", "definition": "only just, almost not", "sentence": "I had {scarcely} sat down when the phone rang.", "translation": "Едва я сел, как зазвонил телефон.", "avoid": ["barely", "hardly"]},
+{"id": "scarcely-adv", "word": "scarcely", "pos": "adv", "rank": 9909, "level": "C1", "topic": "quantity", "definition": "only just, almost not", "sentence": "I had {scarcely} sat down when the phone rang.", "translation": "Едва я сел, как зазвонил телефон.", "avoid": ["barely", "hardly"]},
 {"id": "grumble-v", "word": "grumble", "pos": "verb", "rank": 10000, "level": "C1", "topic": "communication", "definition": "to keep saying in a low voice that you are not happy about something", "sentence": "He {grumbled} about the price the whole way home.", "translation": "Он всю дорогу домой ворчал насчёт цены.", "avoid": []}
 ]
