@@ -47,8 +47,8 @@ A stage is done only after: `npm run check` is clean, the game was played in a r
 
 ## Word base (SPEC §9), how to continue
 
-1. Read `docs/words/PROGRESS.md` and `docs/words/SOURCE.md`; continue from the first range not marked done.
-2. Entries are written strictly by `docs/words/master-list.tsv`, in batches of 250, order of levels B2 → C1 → B1 → A2 → A1, files of 500 in `src/content/words/NNNNN-NNNNN.json`.
+1. Read `docs/words/PROGRESS.md` and `docs/words/SOURCE.md`; continue from the first range not marked done. `python3 scripts/words/next_batch.py B2` prints the next 250 words to write.
+2. Entries are written strictly by `docs/words/master-list.tsv`, in batches of 250, order of levels B2 → C1 → B1 → A2 → A1, files of 500 in `src/content/words/NNNNN-NNNNN.json`. Write them as a data file (see `docs/words/batches/`) and run `python3 scripts/words/add_entries.py <file>`; it fills rank and level from the master list.
 3. Before committing a batch: `npm run validate-words` (also regenerates `manifest.json` and `word-index.json`), then read 25 random entries critically and fix them; write `docs/words/batch-NNNNN.md`.
    `avoid` may only name words that exist in the base with the same pos; list every neighbour that also fits the definition.
 4. Bad cards flagged by the player arrive in an export file; fix them in a separate commit and log in `docs/words/fixes.md`.

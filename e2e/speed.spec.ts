@@ -9,9 +9,12 @@ const byId = new Map(words.map((w) => [w.id, w]));
 test.describe('speed check (SPEC 7)', () => {
   test('explains itself when nothing is below the start level', async ({ page }) => {
     await openFresh(page);
+    await page.goto(`${APP_PATH}#/settings`);
+    await page.getByRole('radio', { name: /^A1/ }).click();
+    await page.goto(`${APP_PATH}#/`);
     await page.getByTestId('nav-speed').click();
     await expect(page.getByTestId('speed-empty')).toBeVisible();
-    await expect(page.getByTestId('speed-empty')).toContainText('No unseen words below B2');
+    await expect(page.getByTestId('speed-empty')).toContainText('A1, the lowest one');
   });
 
   test('types words below the start level: correct → learned, skip → queue', async ({ page }) => {

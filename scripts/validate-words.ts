@@ -23,11 +23,16 @@ const simpleWords = new Set(
 
 const masterPath = resolve(root, 'docs/words/master-list.tsv');
 let masterRanks: Map<string, number> | undefined;
+let masterEntries: Array<{ word: string; pos: string; rank: number }> | undefined;
 if (existsSync(masterPath)) {
   masterRanks = new Map();
+  masterEntries = [];
   for (const line of readFileSync(masterPath, 'utf8').split('\n').slice(1)) {
     const [word, pos, rank] = line.split('\t');
-    if (word && pos && rank) masterRanks.set(`${word}|${pos}`, Number(rank));
+    if (word && pos && rank) {
+      masterRanks.set(`${word}|${pos}`, Number(rank));
+      masterEntries.push({ word, pos, rank: Number(rank) });
+    }
   }
 } else {
   console.log('validate-words: docs/words/master-list.tsv not found, rank check skipped (starter set has provisional ranks)');
@@ -57,7 +62,7 @@ for (const file of files) {
   }
 }
 
-problems.push(...validateEntries(all, { topics: TOPICS, levels: LEVELS, pos: POS, simpleWords, masterRanks }));
+problems.push(...validateEntries(all, { topics: TOPICS, levels: LEVELS, pos: POS, simpleWords, masterRanks, masterEntries }));
 
 if (problems.length > 0) {
   for (const p of problems) console.error(`${p.file} ${p.id}: ${p.message}`);

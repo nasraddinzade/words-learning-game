@@ -1,0 +1,804 @@
+# Manual corrections applied by scripts/words/build_master_list.py (SPEC 9.2, "obvious exceptions by hand").
+# word<TAB>drop            removes the word (names, abbreviations, fragments, crude words)
+# word<TAB>pos<TAB><pos>   fixes the part of speech
+john	drop
+august	drop
+china	drop
+japan	drop
+peter	drop
+smith	drop
+google	drop
+jack	drop
+tom	drop
+twitter	drop
+mike	drop
+christ	drop
+martin	drop
+henry	drop
+lee	drop
+harry	drop
+ben	drop
+trump	drop
+christian	drop
+catholic	drop
+bob	drop
+nick	drop
+wale	drop
+kinda	drop
+pacific	drop
+singe	drop
+soviet	drop
+brazil	drop
+matt	drop
+mar	drop
+amazon	drop
+bible	drop
+miller	drop
+pa	drop
+ford	drop
+porn	drop
+roman	drop
+auto	drop
+pic	drop
+bullshit	drop
+mac	drop
+jimmy	drop
+android	drop
+jay	drop
+mare	drop
+rep	drop
+min	drop
+dean	drop
+doc	drop
+wee	drop
+berlin	drop
+oxford	drop
+anna	drop
+jean	drop
+robin	drop
+carter	drop
+josh	drop
+sept	drop
+gen	drop
+sec	drop
+billy	drop
+rick	drop
+hr	drop
+opus	drop
+eve	drop
+walker	drop
+virgin	drop
+nazi	drop
+commonwealth	drop
+found	drop
+cutting	drop
+serving	drop
+trading	drop
+burning	drop
+hanging	drop
+handling	drop
+beating	drop
+closing	drop
+semi	drop
+mini	drop
+max	drop
+ma	drop
+means	drop
+playing	drop
+living	drop
+accord	drop
+non	drop
+thinking	drop
+won	drop
+felt	drop
+growing	drop
+remains	drop
+incorporated	drop
+buying	drop
+bigger	drop
+closer	drop
+sub	drop
+sales	drop
+anti	drop
+pro	drop
+plus	drop
+till	drop
+acting	drop
+mid	drop
+broke	drop
+rape	drop
+sitting	drop
+graham	drop
+dec	drop
+con	drop
+ab	drop
+corp	drop
+cooper	drop
+warren	drop
+yea	drop
+khan	drop
+marshall	drop
+nelson	drop
+terry	drop
+batman	drop
+bobby	drop
+charlotte	drop
+perry	drop
+cole	drop
+brook	drop
+franklin	drop
+ken	drop
+phoenix	drop
+victor	drop
+chuck	drop
+earl	drop
+wright	drop
+turner	drop
+gm	drop
+cc	drop
+mason	drop
+cam	drop
+inter	drop
+par	drop
+benjamin	drop
+manhattan	drop
+thou	drop
+travelling	drop
+collins	drop
+costa	drop
+welsh	drop
+os	drop
+rev	drop
+ref	drop
+potter	drop
+murphy	drop
+guinea	drop
+brad	drop
+easter	drop
+mg	drop
+prof	drop
+ml	drop
+tit	drop
+warner	drop
+titan	drop
+reed	drop
+wick	drop
+derby	drop
+cum	drop
+chile	drop
+coke	drop
+wive	drop
+dope	drop
+nude	drop
+bailey	drop
+sierra	drop
+carol	drop
+ruth	drop
+shook	drop
+sophisticate	drop
+harper	drop
+hart	drop
+shanghai	drop
+thanksgiving	drop
+marc	drop
+mph	drop
+lynch	drop
+boob	drop
+superman	drop
+sander	drop
+mod	drop
+sen	drop
+dale	drop
+masse	drop
+dame	drop
+capitol	drop
+geneva	drop
+java	drop
+penis	drop
+pee	drop
+fixing	drop
+mixing	drop
+filing	drop
+holding	drop
+clearing	drop
+belonging	drop
+backing	drop
+casting	drop
+feeding	drop
+breathing	drop
+freezing	drop
+pricing	drop
+dub	drop
+bash	drop
+goddamn	drop
+neo	drop
+whatsoever	drop
+yr	drop
+ph	drop
+sally	drop
+drake	drop
+homer	drop
+chi	drop
+col	drop
+troy	drop
+cox	drop
+newton	drop
+lance	drop
+chad	drop
+randy	drop
+nova	drop
+gal	drop
+yang	drop
+ana	drop
+jenny	drop
+mommy	drop
+temp	drop
+comp	drop
+blah	drop
+holly	drop
+manila	drop
+teddy	drop
+midland	drop
+shit	drop
+beth	drop
+burke	drop
+glen	drop
+heather	drop
+molly	drop
+brit	drop
+spec	drop
+bronco	drop
+yahoo	drop
+valentine	drop
+kirk	drop
+para	drop
+hank	drop
+jade	drop
+donna	drop
+ira	drop
+marina	drop
+calif	drop
+freeman	drop
+rand	drop
+hooker	drop
+prom	drop
+caput	drop
+timothy	drop
+negro	drop
+poop	drop
+madame	drop
+morocco	drop
+fella	drop
+mag	drop
+dong	drop
+tucker	drop
+swinge	drop
+chapman	drop
+somerset	drop
+confederate	drop
+silva	drop
+surrey	drop
+tesla	drop
+wheeler	drop
+maxwell	drop
+napoleon	drop
+lense	drop
+motherfucker	drop
+heath	drop
+ooh	drop
+sterling	drop
+plumb	drop
+char	drop
+unarm	drop
+reeve	drop
+don	drop
+headquarter	drop
+misguide	drop
+sire	drop
+parry	drop
+cock	drop
+daunt	drop
+forego	drop
+prick	drop
+retard	drop
+din	drop
+wed	drop
+lade	drop
+bale	drop
+aft	drop
+centenary	drop
+pant	drop
+brewing	drop
+harvesting	drop
+swearing	drop
+modelling	drop
+coping	drop
+costing	drop
+striving	drop
+folding	drop
+bearing	drop
+dealing	drop
+marking	drop
+tracing	drop
+doubling	drop
+grouping	drop
+grading	drop
+bidding	drop
+conditioning	drop
+standing	drop
+billing	drop
+mating	drop
+bedding	drop
+clipping	drop
+furnishing	drop
+siding	drop
+scaling	drop
+kindle	drop
+gore	drop
+nim	drop
+chandler	drop
+congo	drop
+lambert	drop
+sherlock	drop
+das	drop
+amino	drop
+mayo	drop
+clarence	drop
+beck	drop
+benedict	drop
+mack	drop
+moody	drop
+oracle	drop
+pentagon	drop
+yuan	drop
+bate	drop
+brent	drop
+monte	drop
+sol	drop
+scotch	drop
+mart	drop
+grad	drop
+tinder	drop
+hale	drop
+dell	drop
+toby	drop
+bonnie	drop
+kris	drop
+stein	drop
+var	drop
+plum	drop
+coca	drop
+kat	drop
+leone	drop
+sonny	drop
+gee	drop
+hogan	drop
+fowler	drop
+sis	drop
+malik	drop
+meth	drop
+paddy	drop
+sic	drop
+savannah	drop
+argentine	drop
+homo	drop
+darn	drop
+dexter	drop
+ness	drop
+weber	drop
+sheikh	drop
+jasper	drop
+barker	drop
+chamberlain	drop
+gaga	drop
+outgo	drop
+baba	drop
+beau	drop
+tang	drop
+buster	drop
+bruin	drop
+dumbass	drop
+hector	drop
+hick	drop
+lea	drop
+springer	drop
+tor	drop
+clement	drop
+aria	drop
+erica	drop
+hoover	drop
+milo	drop
+playboy	drop
+rue	drop
+sup	drop
+veronica	drop
+crore	drop
+amelia	drop
+booker	drop
+canton	drop
+kc	drop
+meg	drop
+phi	drop
+raj	drop
+ulster	drop
+apache	drop
+dolly	drop
+hazel	drop
+kylie	drop
+sawyer	drop
+viola	drop
+ala	drop
+bach	drop
+bolivia	drop
+burgess	drop
+chevy	drop
+jonah	drop
+lite	drop
+mono	drop
+tad	drop
+anus	drop
+dickens	drop
+mandarin	drop
+waterloo	drop
+wen	drop
+pip	drop
+nan	drop
+techno	drop
+rpm	drop
+ling	drop
+sigma	drop
+yank	drop
+lama	drop
+eff	drop
+fanny	drop
+mater	drop
+mercer	drop
+rbi	drop
+thatcher	drop
+trivium	drop
+lakh	drop
+padre	drop
+olympian	drop
+swede	drop
+ain	drop
+kappa	drop
+slater	drop
+underwood	drop
+swat	drop
+dun	drop
+gent	drop
+mara	drop
+marquis	drop
+pong	drop
+psi	drop
+wally	drop
+marlin	drop
+titty	drop
+fucker	drop
+gran	drop
+lam	drop
+roe	drop
+dirk	drop
+lucifer	drop
+nay	drop
+pharma	drop
+pol	drop
+trey	drop
+blanc	drop
+decker	drop
+merlin	drop
+morrow	drop
+cad	drop
+coop	drop
+cps	drop
+deco	drop
+goo	drop
+momma	drop
+hubby	drop
+lefty	drop
+amir	drop
+bender	drop
+greenwood	drop
+bartlett	drop
+fab	drop
+kremlin	drop
+langley	drop
+liv	drop
+magnum	drop
+mei	drop
+mv	drop
+rad	drop
+skinner	drop
+jag	drop
+conn	drop
+cisco	drop
+coco	drop
+derrick	drop
+musk	drop
+bong	drop
+dildo	drop
+dyke	drop
+blowjob	drop
+arse	drop
+jock	drop
+trojan	drop
+goofy	drop
+pimp	drop
+stripper	drop
+orgasm	drop
+masturbate	drop
+masturbation	drop
+erection	drop
+vagina	drop
+vaginal	drop
+genital	drop
+nipple	drop
+fart	drop
+puke	drop
+horny	drop
+booty	drop
+asshole	drop
+ass	drop
+bastard	drop
+fuck	drop
+dick	drop
+crappy	drop
+pedophile	drop
+rapist	drop
+prostitute	drop
+prostitution	drop
+anyways	drop
+bravo	drop
+nil	drop
+ye	drop
+issue	pos	noun
+base	pos	noun
+current	pos	adj
+official	pos	adj
+female	pos	adj
+male	pos	adj
+firm	pos	noun
+holy	pos	adj
+dry	pos	adj
+honor	pos	noun
+institute	pos	noun
+silver	pos	noun
+colour	pos	noun
+favor	pos	noun
+minimum	pos	noun
+maximum	pos	noun
+teen	pos	noun
+fleet	pos	noun
+slight	pos	adj
+butt	pos	noun
+duck	pos	noun
+buck	pos	noun
+offensive	pos	adj
+liquid	pos	noun
+downtown	pos	adv
+olive	pos	noun
+shy	pos	adj
+cardinal	pos	noun
+fifteen	pos	det
+sixty	pos	det
+seventy	pos	det
+eighty	pos	det
+ninety	pos	det
+thirteen	pos	det
+fourteen	pos	det
+sixteen	pos	det
+seventeen	pos	det
+eighteen	pos	det
+nineteen	pos	det
+pepper	pos	noun
+podcast	pos	noun
+visa	pos	noun
+abstract	pos	adj
+butterfly	pos	noun
+arch	pos	noun
+harbour	pos	noun
+curry	pos	noun
+raven	pos	noun
+minus	pos	prep
+mum	pos	noun
+lame	pos	adj
+pedal	pos	noun
+mimic	pos	verb
+lounge	pos	noun
+vest	pos	noun
+stud	pos	noun
+slate	pos	noun
+crow	pos	noun
+groom	pos	noun
+ferry	pos	noun
+spear	pos	noun
+lace	pos	noun
+tow	pos	verb
+hog	pos	noun
+moor	pos	noun
+mould	pos	noun
+badger	pos	noun
+honeymoon	pos	noun
+demise	pos	noun
+savvy	pos	adj
+rebate	pos	noun
+compassionate	pos	adj
+pyramid	pos	noun
+telescope	pos	noun
+cushion	pos	noun
+bankrupt	pos	adj
+subtitle	pos	noun
+heist	pos	noun
+garland	pos	noun
+keynote	pos	noun
+maroon	pos	adj
+eddy	pos	noun
+gorge	pos	noun
+blister	pos	noun
+bulldog	pos	noun
+malt	pos	noun
+lavish	pos	adj
+puddle	pos	noun
+tote	pos	noun
+latch	pos	noun
+slur	pos	noun
+hurdle	pos	noun
+crank	pos	noun
+stitch	pos	noun
+tunnel	pos	noun
+cereal	pos	noun
+dent	pos	noun
+dove	pos	noun
+gag	pos	noun
+intern	pos	noun
+cheer	pos	noun
+dive	pos	verb
+outlaw	pos	noun
+mesh	pos	noun
+clamp	pos	noun
+graft	pos	noun
+perch	pos	noun
+spook	pos	noun
+combatant	pos	noun
+dissident	pos	noun
+tributary	pos	noun
+hum	pos	verb
+scrap	pos	noun
+rig	pos	noun
+hack	pos	noun
+chop	pos	verb
+blend	pos	verb
+toss	pos	verb
+bump	pos	verb
+jerk	pos	noun
+mock	pos	verb
+dash	pos	noun
+whip	pos	noun
+grip	pos	noun
+rub	pos	verb
+dip	pos	verb
+echo	pos	noun
+bud	pos	noun
+dam	pos	noun
+rod	pos	noun
+seal	pos	noun
+tan	pos	noun
+tag	pos	noun
+hook	pos	noun
+steam	pos	noun
+thread	pos	noun
+string	pos	noun
+strip	pos	noun
+bat	pos	noun
+screw	pos	noun
+nail	pos	noun
+trail	pos	noun
+format	pos	noun
+file	pos	noun
+mark	pos	noun
+press	pos	noun
+sign	pos	noun
+plan	pos	noun
+schedule	pos	noun
+design	pos	noun
+double	pos	adj
+surprise	pos	noun
+dress	pos	noun
+waste	pos	noun
+cross	pos	noun
+load	pos	noun
+cast	pos	noun
+pin	pos	noun
+spin	pos	noun
+quote	pos	noun
+label	pos	noun
+monitor	pos	noun
+finance	pos	noun
+draft	pos	noun
+mount	pos	noun
+ban	pos	noun
+lock	pos	noun
+stake	pos	noun
+stamp	pos	noun
+brush	pos	noun
+polish	pos	noun
+bow	pos	noun
+flip	pos	verb
+loop	pos	noun
+boom	pos	noun
+spare	pos	adj
+peer	pos	noun
+fancy	pos	adj
+scan	pos	noun
+probe	pos	noun
+warrant	pos	noun
+rally	pos	noun
+trace	pos	noun
+float	pos	verb
+sail	pos	verb
+spy	pos	noun
+alert	pos	noun
+drill	pos	noun
+ram	pos	noun
+torture	pos	noun
+triple	pos	adj
+frustrate	pos	verb
+jam	pos	noun
+bust	pos	noun
+curse	pos	noun
+convict	pos	verb
+pat	pos	verb
+substitute	pos	noun
+fold	pos	verb
+plug	pos	noun
+burst	pos	verb
+lease	pos	noun
+flirt	pos	verb
+massage	pos	noun
+dye	pos	noun
+gauge	pos	noun
+glance	pos	noun
+plague	pos	noun
+weave	pos	verb
+pierce	pos	verb
+curl	pos	verb
+soak	pos	verb
+offset	pos	noun
+forge	pos	verb
+whistle	pos	noun
+sprint	pos	noun
+erect	pos	verb
+vow	pos	noun
+clutch	pos	noun
+vent	pos	noun
+flush	pos	verb
+sting	pos	noun
+wade	pos	verb
+chronicle	pos	noun
+hatch	pos	verb
+herald	pos	noun
+exile	pos	noun
+relay	pos	noun
+crane	pos	noun
+mold	pos	noun
+cater	pos	verb
+stalk	pos	verb
+splash	pos	noun
+carve	pos	verb
+roar	pos	noun
+audition	pos	noun
+hollow	pos	adj
+veil	pos	noun
+sling	pos	noun
+flick	pos	verb
+moan	pos	verb
+sob	pos	verb
+envy	pos	noun
+cling	pos	verb
+soar	pos	verb
+giggle	pos	verb
+grin	pos	noun
+tease	pos	verb
+nowadays	pos	adv
+scroll	pos	verb
+surf	pos	verb

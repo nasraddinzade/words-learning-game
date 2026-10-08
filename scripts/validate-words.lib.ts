@@ -14,6 +14,9 @@ export interface Rules {
   simpleRatio?: number;
   /** word+pos → rank from docs/words/master-list.tsv, when it exists. */
   masterRanks?: ReadonlyMap<string, number>;
+  /** Every (word, pos, rank) of the master list: the distractor supply is counted against the
+   *  finished base, not the batches written so far. */
+  masterEntries?: ReadonlyArray<{ word: string; pos: string; rank: number }>;
   /** Minimum distractor supply per word. */
   minDistractors?: number;
   /** Rank window for distractors. */
@@ -35,6 +38,7 @@ const DEFINITION_MAX_WORDS = 15;
 export const DEFAULT_SIMPLE_RATIO = 0.7;
 export const DEFAULT_MIN_DISTRACTORS = 5;
 export const DEFAULT_RANK_WINDOW = 300;
+const FUNCTION_POS = new Set(['det', 'pron', 'prep', 'conj', 'interj']);
 
 const isStr = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
 const isStrArray = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string');
@@ -122,10 +126,10 @@ export function validateEntries(items: Array<{ entry: unknown; file: string }>, 
 /** Cross-entry checks: avoid words exist with the same pos, every word has enough distractors. */
 export function validateRelations(entries: ParsedEntry[], rules: Rules): Problem[] {
   const problems: Problem[] = [];
-  const byWordPos = new Map<string, ParsedEntry>();
-  for (const e of entries) byWordPos.set(`${e.word}|${e.pos}`, e);
-  const byPos = new Map<string, ParsedEntry[]>();
-  for (const e of entries) {
+  const byWordPos = new Set<string>();
+  for (const e of rules.masterEntries ?? entries) byWordPos.add(`${e.word}|${e.pos}`);
+  const byPos = new Map<string, Array<{ word: string; pos: string; rank: number }>>();
+  for (const e of rules.masterEntries ?? entries) {
     const list = byPos.get(e.pos) ?? [];
     list.push(e);
     byPos.set(e.pos, list);
@@ -139,7 +143,10 @@ export function validateRelations(entries: ParsedEntry[], rules: Rules): Problem
       else if (!byWordPos.has(`${a}|${e.pos}`)) problems.push({ file: e.file, id: e.id, message: `avoid word "${a}" does not exist as ${e.pos}` });
     }
     const avoid = new Set(e.avoid);
-    const supply = (byPos.get(e.pos) ?? []).filter((o) => o.id !== e.id && !avoid.has(o.word) && Math.abs(o.rank - e.rank) <= window).length;
+    // Function words (det, pron, prep, conj, interj) are few and spread over all ranks: the game
+    // falls back to the whole part of speech for them, so the check does too.
+    const win = FUNCTION_POS.has(e.pos) ? Number.POSITIVE_INFINITY : window;
+    const supply = (byPos.get(e.pos) ?? []).filter((o) => o.word !== e.word && !avoid.has(o.word) && Math.abs(o.rank - e.rank) <= win).length;
     if (supply < min) problems.push({ file: e.file, id: e.id, message: `only ${supply} distractors available (min ${min})` });
   }
   return problems;
@@ -159,9 +166,11 @@ export function containsStem(definition: string, word: string): boolean {
 const tokenize = (text: string) => text.toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) ?? [];
 
 /** Crude lemmatiser: enough to map "wanting", "tries", "bigger", "quickly" onto list words. */
+const IRREGULAR = new Set(['am', 'is', 'are', 'was', 'were', 'been', 'being', 'has', 'had', 'did', 'done', 'went', 'gone', 'made', 'said', 'took', 'taken', 'got', 'gotten', 'came', 'gave', 'given', 'saw', 'seen', 'knew', 'known', 'felt', 'kept', 'left', 'lost', 'put', 'ran', 'sat', 'told', 'thought', 'found', 'teeth', 'feet', 'children', 'men', 'women', 'people', 'better', 'best', 'worse', 'worst', 'more', 'most', 'less', 'least']);
+
 export function isSimpleToken(token: string, simple: ReadonlySet<string>): boolean {
   const t = token.replace(/'(s|t|re|ve|ll|d|m)$/, '');
-  if (t.length <= 2 || simple.has(t)) return true;
+  if (t.length <= 2 || simple.has(t) || IRREGULAR.has(t)) return true;
   const candidates = new Set<string>();
   for (const [suffix, repl] of [
     ['ies', 'y'], ['ied', 'y'], ['ier', 'y'], ['iest', 'y'], ['ily', 'y'], ['iness', 'y'],

@@ -1,0 +1,6 @@
+[
+{"id": "turmoil-n", "word": "turmoil", "pos": "noun", "rank": 8270, "level": "C1", "topic": "feelings", "definition": "a state of great confusion, worry or disorder", "sentence": "My life was in {turmoil} after the move.", "translation": "После переезда моя жизнь была в полном раздрае.", "avoid": ["chaos"]},
+{"id": "drawback-n", "word": "drawback", "pos": "noun", "rank": 8308, "level": "C1", "topic": "thinking", "definition": "a disadvantage or problem that makes something less good", "sentence": "The only {drawback} of the flat is the noisy street.", "translation": "Единственный минус квартиры — шумная улица.", "avoid": ["flaw"]},
+{"id": "nuisance-n", "word": "nuisance", "pos": "noun", "rank": 8441, "level": "C1", "topic": "feelings", "definition": "a person or thing that annoys you or causes small problems", "sentence": "The mosquitoes were a real {nuisance} on the terrace.", "translation": "Комары на террасе были настоящей напастью.", "avoid": []},
+{"id": "tedious-adj", "word": "tedious", "pos": "adj", "rank": 8456, "level": "C1", "topic": "feelings", "definition": "boring and lasting too long", "sentence": "Filling in those forms is a {tedious} job.", "translation": "Заполнять эти формы — нудное занятие.", "avoid": ["dull"]}
+]
