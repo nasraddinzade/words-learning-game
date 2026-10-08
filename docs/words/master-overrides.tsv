@@ -1359,3 +1359,6 @@ canon	drop
 demo	drop
 cardinal	drop
 hail	pos	noun
+blow	pos	verb
+aid	pos	noun
+yesterday	pos	adv
