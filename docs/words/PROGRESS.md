@@ -13,7 +13,7 @@ Counts are entries written / entries in the master list for that level.
 | Level | Rank band | Written | Notes |
 |---|---|---|---|
 | B2 | 4001–6500 | 2500 / 2500 | **done**: starter words + batches 1–10 (4001–6500); words that cross into B2 after a rebuild are picked up by the next C1 batch |
-| C1 | 6501–10000 | 870 / 3500 | starter words + batch 10 (6501–6601) + C1 batches 1–3 (6602–7356). Next: `python3 scripts/words/next_batch.py C1` → from rank 7357 |
+| C1 | 6501–10000 | 1120 / 3500 | starter words + batch 10 (6501–6601) + C1 batches 1–4 (6602–7608). Next: `python3 scripts/words/next_batch.py C1` → from rank 7609 |
 | B1 | 2001–4000 | 154 / 2000 | starter words only |
 | A2 | 1001–2000 | 38 / 1000 | starter words only |
 | A1 | 1–1000 | 2 / 1000 | two words only (*reveal*, *reading*); not started |
