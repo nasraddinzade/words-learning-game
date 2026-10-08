@@ -62,16 +62,17 @@ test.describe('gameplay', () => {
     await startGame(page, { seed: 'debt', newPerGame: 15 });
     const missed = await tapWrong(page);
     await continueCard(page);
+    // The word returns after 3-5 other rounds (SPEC 6.2), so it is the 4th to 6th round we see.
     let roundsUntilReturn = 0;
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       const round = await readRound(page);
       roundsUntilReturn += 1;
       if (round.correctId === missed.correctId) break;
       await tapCorrect(page);
       await continueCard(page);
     }
-    expect(roundsUntilReturn).toBeGreaterThanOrEqual(3);
-    expect(roundsUntilReturn).toBeLessThanOrEqual(5);
+    expect(roundsUntilReturn).toBeGreaterThanOrEqual(4);
+    expect(roundsUntilReturn).toBeLessThanOrEqual(6);
     await expect(page.getByTestId('explanation')).toContainText('It came back');
     await tapCorrect(page);
     await continueCard(page);
