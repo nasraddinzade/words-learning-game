@@ -1355,3 +1355,7 @@ binding	drop
 shooter	drop
 vintage	pos	adj
 advisory	pos	adj
+canon	drop
+demo	drop
+cardinal	drop
+hail	pos	noun
