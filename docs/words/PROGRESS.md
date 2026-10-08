@@ -2,23 +2,28 @@
 
 Read this first in every word-base session. Continue from the first range that is not done.
 
-## Status
+## Master list
 
-| Range (rank) | Level | File | Status | Date | Notes |
-|---|---|---|---|---|---|
-| 4001–4314 (provisional) | B2 | `src/content/words/04001-04500.json` | done, starter set, 314 entries | 2026-10-07 | Written for stage 1 before the master list exists. Ranks follow writing order, not frequency. Review: `batch-04001.md`. |
+Done 2026-10-08: `docs/words/master-list.tsv`, 10 000 rows (see `SOURCE.md`), with `master-overrides.tsv` for the ~800 manual drops and part-of-speech fixes found in a full read of the list. `validate-words` enforces master-list ranks and counts the distractor supply and `avoid` words against the master list, so a batch is valid on its own.
 
-Everything else: not started. Line W starts after stage 1 (SPEC §15), in this order: B2 (rest), C1, B1, A2, A1.
+## Status by level (order of work: B2 → C1 → B1 → A2 → A1)
 
-## Before line W starts
+Counts are entries written / entries in the master list for that level.
 
-1. Decide the frequency source and record licence in `SOURCE.md` (candidates listed there).
-2. Build `docs/words/master-list.tsv` (word, pos, rank, level), 10 000 rows, header line.
-3. Re-rank the starter set against the master list and move entries into the right 500-word files. `validate-words` enforces master-list ranks as soon as the file exists.
+| Level | Rank band | Written | Notes |
+|---|---|---|---|
+| B2 | 4001–6500 | 358 / 2500 | starter words + batch 1 (4001–4267). Next: `python3 scripts/words/next_batch.py B2` → from rank 4268 |
+| C1 | 6501–10000 | 23 / 3500 | starter words only |
+| B1 | 2001–4000 | 150 / 2000 | starter words only |
+| A2 | 1001–2000 | 32 / 1000 | starter words only |
+| A1 | 1–1000 | 1 / 1000 | one starter word (*reveal*, rank 998); not started |
+
+Batch log: `docs/words/batch-*.md`. Fix log for Bad-card reports: `docs/words/fixes.md`.
 
 ## How a batch is done
 
-- 250 words per batch, strictly from the master list.
-- `npm run validate-words` clean.
-- 25 random entries read critically (meaning, collisions with neighbours, natural sentence, correct translation). More than 3 bad out of 25 → re-read the whole batch.
-- `docs/words/batch-NNNNN.md` with the result, then `content: words NNNNN-NNNNN` commit, separate from code.
+1. `python3 scripts/words/next_batch.py B2` prints the next 250 master-list words of the level with no entry yet, in rank order.
+2. Write the entries by SPEC §9.3 as a Python data file (`ENTRIES = [(word, pos, topic, definition, sentence, translation, avoid[, accept]), …]`) and run `python3 scripts/words/add_entries.py <file>`: it takes rank and level from the master list and places entries in the 500-rank files. Previous data files live in `docs/words/batches/`.
+3. `npm run validate-words` clean. If the master list has a wrong part of speech, fix it in `master-overrides.tsv`, rebuild (see `SOURCE.md`), run `scripts/words/rerank_starter.py`.
+4. 25 random entries read critically (meaning, collisions with neighbours, natural sentence, correct translation). More than 3 bad out of 25 → re-read the whole batch.
+5. `docs/words/batch-<first rank>.md` with the result, then `content: words <first>-<last>` commit, separate from code.
