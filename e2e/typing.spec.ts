@@ -130,9 +130,12 @@ test.describe('fast skip (SPEC 6.3)', () => {
         await expect(page.getByTestId('word-card')).toHaveAttribute('data-verdict', 'learned');
         checked = true;
       } else {
-        // Slow taps on the other new words (speed 0.5: the fall takes 20 s, a third is 6.7 s).
+        // Slow taps on the other new words. A word counts as fast within the first third of its
+        // own fall, and words spawn up to 30% of the fall late, so tap at ~14 s: past the third of
+        // the last-spawned word (12.7 s at level 0, 10.8 s at levels 1-2) and before the first one
+        // reaches the bottom (17-20 s at speed 0.5). tapCorrect adds its own 2 s.
         await readRound(page);
-        await page.waitForTimeout(6000);
+        await page.waitForTimeout(12000);
         await tapCorrect(page);
       }
       await continueCard(page);
@@ -154,8 +157,9 @@ test.describe('fast skip (SPEC 6.3)', () => {
         await expect(page.getByTestId('word-card')).toHaveAttribute('data-verdict', 'skipFailed');
         checked = true;
       } else {
+        // Same slow-tap timing as above: past every word's first third, before the bottom.
         await readRound(page);
-        await page.waitForTimeout(6000);
+        await page.waitForTimeout(12000);
         await tapCorrect(page);
       }
       await continueCard(page);
