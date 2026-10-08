@@ -13,10 +13,10 @@ Counts are entries written / entries in the master list for that level.
 | Level | Rank band | Written | Notes |
 |---|---|---|---|
 | B2 | 4001–6500 | 2500 / 2500 | **done**: starter words + batches 1–10 (4001–6500); words that cross into B2 after a rebuild are picked up by the next C1 batch |
-| C1 | 6501–10000 | 3493 / 3500 | **done**: starter words + batch 10 (6501–6601) + C1 batches 1–14 (6602–9999); words that cross into C1 after a rebuild are picked up by the next batch of any level; 7 entries moved down to B2 in the B1 batch 1–2 rebuilds, so the count reads 3493 although every C1 rank has an entry |
-| B1 | 2001–4000 | 664 / 2000 | starter words + B1 batches 1–2 (2001–2537, plus *bomber*, *meme*). Next: `python3 scripts/words/next_batch.py B1` → from rank 2538 |
+| C1 | 6501–10000 | 3488 / 3500 | **done**: starter words + batch 10 (6501–6601) + C1 batches 1–14 (6602–9999); words that cross into C1 after a rebuild are picked up by the next batch of any level; 12 entries moved down to B2 in the B1 batch 1–3 rebuilds, so the count reads 3488 although every C1 rank has an entry |
+| B1 | 2001–4000 | 917 / 2000 | starter words + B1 batches 1–3 (2001–2816, plus *bomber*, *meme*). Next: `python3 scripts/words/next_batch.py B1` → from rank 2817 |
 | A2 | 1001–2000 | 38 / 1000 | starter words only |
-| A1 | 1–1000 | 2 / 1000 | two words only (*reveal*, *reading*); not started |
+| A1 | 1–1000 | 4 / 1000 | four words only (*reveal*, *reading*, *meeting*, *limited*); not started |
 
 Batch log: `docs/words/batch-*.md`. Fix log for Bad-card reports: `docs/words/fixes.md`.
 
