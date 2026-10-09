@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { displayWord } from '@/app/format';
 import type { WordEntry } from '@/content/types';
 import { BALANCE } from '@/game/balance';
 import { positionsAt, type FallWord } from '@/game/fall';
@@ -138,7 +139,7 @@ export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEna
               className={`absolute top-0 flex min-h-14 items-center justify-center rounded-2xl bg-surface px-1 font-bold text-text shadow-glow will-change-transform select-none ${fontClass(e.word)}`}
               style={{ left: `calc(${f.lane * laneWidth}% + 4px)`, width: `calc(${laneWidth}% - 8px)`, opacity: 0, transform: `translateY(-${CHIP_H + 8}px)` }}
             >
-              <span className="px-1 leading-tight break-words">{e.word}</span>
+              <span className="px-1 leading-tight break-words">{displayWord(e.word)}</span>
               <span className="key-badge absolute -top-2 -left-1 hidden h-5 min-w-5 items-center justify-center rounded-full bg-bg-2 px-1 text-[11px] font-bold text-muted" aria-hidden>
                 {round.fall.findIndex((x) => x.id === f.id) + 1}
               </span>
@@ -157,7 +158,7 @@ export function Field({ round, typed = '', entry, onTap, onMiss, elapsed, devEna
           className="absolute top-0 left-1/2 flex min-h-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-surface px-3 shadow-glow will-change-transform"
           style={{ opacity: 0, transform: `translateY(-${CHIP_H + 8}px)` }}
         >
-          <TypingSlots word={target.word} revealed={round.revealed} typed={typed} />
+          <TypingSlots word={displayWord(target.word)} revealed={round.revealed} typed={typed} />
         </div>
       )}
     </section>

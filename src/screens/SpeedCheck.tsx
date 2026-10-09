@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNav } from '@/app/nav';
 import { useProfile } from '@/app/profileStore';
 import { useSpeed } from '@/app/speedStore';
+import { displayWord } from '@/app/format';
 import { TYPING_INPUT_ATTRS, useVisualViewportHeight } from '@/app/viewport';
 import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
@@ -89,7 +90,7 @@ export function SpeedCheck() {
             </dl>
             {state.sentToQueue.length > 0 && (
               <p className="text-sm text-muted">
-                To the queue: {state.sentToQueue.map((id) => entry(id)?.word ?? id).join(', ')}
+                To the queue: {state.sentToQueue.map((id) => displayWord(entry(id)?.word ?? id)).join(', ')}
               </p>
             )}
             <div className="mt-auto grid gap-3">
@@ -122,7 +123,7 @@ export function SpeedCheck() {
       <footer data-testid="explanation" className="relative min-h-24 border-t border-border bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
         {phase === 'feedback' && last && lastEntry ? (
           <p className={`text-xl font-bold ${last.outcome === 'learned' ? 'text-ok' : 'text-warn'}`} data-testid="speed-feedback" data-outcome={last.outcome}>
-            {last.outcome === 'learned' ? `Learned: ${lastEntry.word}` : `To the queue: ${lastEntry.word}`}
+            {last.outcome === 'learned' ? `Learned: ${displayWord(lastEntry.word)}` : `To the queue: ${displayWord(lastEntry.word)}`}
           </p>
         ) : (
           <>

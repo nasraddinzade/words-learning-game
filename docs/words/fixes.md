@@ -4,4 +4,4 @@ How it works: the player presses **Bad card** on a word; the id lands in `flagge
 
 | Date | Word id | What was wrong | Fix |
 |---|---|---|---|
-| (none yet) | | | |
+| 2026-10-09 | i-pron | Stored lower case (validate-words requires it), so the game showed "i" on the chip, the card and in the sentence gap. Found during A1 batch 1, not a player report. | `fix:` commit: `displayWord` in `src/app/format.ts` capitalises this one word on every screen (chip, typing slots, card, flight, speed check, summary, speech); `content:` commit: the sentence gap written as `{I}`. Checked in the browser: `docs/verification/screenshots/word-i/phone-field.png`, `phone-card.png`. |
