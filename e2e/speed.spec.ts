@@ -39,8 +39,10 @@ test.describe('speed check (SPEC 7)', () => {
     await expect(page.getByTestId('speed-learned-live')).toHaveText('✓ 1');
 
     const third = (await page.getByTestId('typing-word').getAttribute('data-word-id'))!;
-    await input.fill('zz');
-    await input.press('Enter');
+    // A wrong answer as long as the word: the speed check submits as soon as the typed text
+    // reaches the word's length, so this works for two-letter words such as "to" as well.
+    await input.fill('z'.repeat(byId.get(third)!.word.length));
+    await expect(page.getByTestId('speed-progress')).toHaveText('4 / 20');
     await expect(page.getByTestId('speed-feedback')).toHaveAttribute('data-outcome', 'queued');
 
     const progress = await readProgress(page);

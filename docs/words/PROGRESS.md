@@ -16,7 +16,7 @@ Counts are entries written / entries in the master list for that level.
 | C1 | 6501–10000 | 3454 / 3500 | **done**: starter words + batch 10 (6501–6601) + C1 batches 1–14 (6602–9999); words that cross into C1 after a rebuild are picked up by the next batch of any level; 46 entries moved down to B2 in later rebuilds, so the count reads 3454 although every C1 rank has an entry |
 | B1 | 2001–4000 | 2000 / 2000 | **done**: starter words + B1 batches 1–8 (2001–3963); words that cross into B1 after a rebuild are picked up by the next batch of any level |
 | A2 | 1001–2000 | 1000 / 1000 | **done**: starter words + A2 batches 1–4 (1002–2000); words that cross into A2 after a rebuild are picked up by the next batch of any level |
-| A1 | 1–1000 | 5 / 1000 | five words only (*being*, *meeting*, *reading*, *lower*, *limited*, all moved in by rebuilds). Next: `python3 scripts/words/next_batch.py A1` → from rank 1 |
+| A1 | 1–1000 | 255 / 1000 | starter words + A1 batch 1 (1–251). Next: `python3 scripts/words/next_batch.py A1` → from rank 252 |
 
 Batch log: `docs/words/batch-*.md`. Fix log for Bad-card reports: `docs/words/fixes.md`.
 
