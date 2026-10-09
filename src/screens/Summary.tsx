@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNav } from '@/app/nav';
 import { useProfile } from '@/app/profileStore';
 import { useGame } from '@/app/gameStore';
-import { formatCount } from '@/app/format';
+import { displayWord, formatCount } from '@/app/format';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { WordCard } from '@/components/WordCard';
@@ -90,7 +90,7 @@ export function Summary() {
                       onClick={() => setOpen(id)}
                       className="flex min-h-12 w-full items-center justify-between rounded-xl border border-border bg-surface px-4 text-left"
                     >
-                      <span className="font-bold">{e.word}</span>
+                      <span className="font-bold">{displayWord(e.word)}</span>
                       <span className="text-sm text-muted">{session.progress[id]?.inDebt ? 'still owed' : 'cleared'}</span>
                     </button>
                   </li>

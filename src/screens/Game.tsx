@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNav } from '@/app/nav';
 import { useProfile } from '@/app/profileStore';
 import { useGame } from '@/app/gameStore';
-import { formatCount } from '@/app/format';
+import { displayWord, formatCount } from '@/app/format';
 import { TYPING_INPUT_ATTRS, useVisualViewportHeight } from '@/app/viewport';
 import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
@@ -128,7 +128,7 @@ export function Game() {
         }
         if (r.outcome === 'learned' && from) {
           const counter = learnedRef.current?.getBoundingClientRect();
-          const word = useGame.getState().entry(r.wordId)?.word ?? '';
+          const word = displayWord(useGame.getState().entry(r.wordId)?.word ?? '');
           if (counter) setFlight({ word, from, to: { x: counter.left + counter.width / 2, y: counter.top + counter.height / 2 } });
         }
         if (!r.correct && r.lifeLost) setShake((n) => n + 1);
