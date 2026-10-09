@@ -28,8 +28,12 @@ export const BALANCE = {
   stepUpEvery: 3,
   /** Typing rounds get this much more time than tap rounds (SPEC §5.2). */
   typeFallFactor: 1.6,
-  /** Speed check (SPEC §7): fast typing rounds, one fixed fall time. */
-  speedCheckFallMs: 7_000,
+  /**
+   * Speed check (SPEC §7): typing rounds, one fixed fall time. With the keyboard open the field
+   * is about half as tall and the first second goes to the keyboard animation, so the fall is
+   * longer than a typing round of the game feels.
+   */
+  speedCheckFallMs: 12_000,
   /** Words per Speed check session. */
   speedCheckBatch: 20,
   /** All words of a round spawn within this share of the fall time. */
